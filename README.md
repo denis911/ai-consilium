@@ -139,13 +139,35 @@ cp .env.example .env
 
 Edit `.env` and fill in your API keys:
 ```env
+# Zero-Cost Free Tier (Recommended for initial testing)
+OPENROUTER_API_KEY=sk-or-v1-your_openrouter_key_here
+
+# Or Frontier Paid Provider Keys
 OPENAI_API_KEY=your_key_here
 ANTHROPIC_API_KEY=your_key_here
 GEMINI_API_KEY=your_key_here
 PERPLEXITY_API_KEY=your_key_here
 XAI_API_KEY=your_key_here
+
 OBSIDIAN_VAULT_PATH=C:/Users/YourName/Documents/ObsidianVault
 ```
+
+---
+
+### 🔑 Zero-Cost Setup: How to Get a Free OpenRouter API Key
+
+To run AI Consilium completely **free of charge ($0 API cost)** across 5 models:
+
+1. **Create an account:** Go to [openrouter.ai](https://openrouter.ai/) and sign up.
+2. **Generate Key:** Navigate to [openrouter.ai/keys](https://openrouter.ai/keys), click **"Create Key"**, and copy your generated key (`sk-or-v1-...`).
+3. **Save to `.env`:** Add `OPENROUTER_API_KEY=sk-or-v1-your-key` into your local `.env` file.
+4. **Automatic Free-Tier Routing:** When only `OPENROUTER_API_KEY` is set, AI Consilium automatically dispatches queries concurrently to 5 frontier free models:
+   - ⚡ `google/gemini-2.0-flash-exp:free`
+   - 🧠 `deepseek/deepseek-r1:free`
+   - 🦙 `meta-llama/llama-3.3-70b-instruct:free`
+   - 🌐 `qwen/qwen-2.5-72b-instruct:free`
+   - 💨 `mistralai/mistral-small-24b-instruct-2501:free`
+
 
 ### 2. Run Locally with `uv`
 ```bash
