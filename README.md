@@ -182,23 +182,46 @@ To run AI Consilium completely **free of charge ($0 API cost)** across 5 models:
 
 
 
-### 2. Run Locally with `uv`
+## 🏃 How to Run AI Consilium (3 Execution Modes)
+
+### Mode 1: Streamlit Interactive Web Application (Recommended)
+Launch the full interactive web dashboard featuring live provider progress bars, interactive consensus gauges, dynamic Mermaid.js rendering, and the audit telemetry console:
+
 ```bash
 # Sync dependencies
 uv sync
 
-# Run Streamlit Web Application
+# Launch Web UI (Access at http://localhost:8501)
 uv run streamlit run app.py
-
-# Or run CLI mode
-uv run python main.py --query "Compare PostgreSQL vs DuckDB for single-user desktop analytics"
 ```
 
-### 3. Run with Docker Compose
+---
+
+### Mode 2: Command-Line CLI Interface
+Execute consensus queries directly from your terminal with optional OpenRouter free tier routing, JSON output, or automated Obsidian vault export:
+
 ```bash
+# Basic terminal query
+uv run python main.py --query "Compare PostgreSQL vs DuckDB for desktop analytics"
+
+# Run query using OpenRouter $0 free model tier & export note to Obsidian vault
+uv run python main.py --query "Compare PostgreSQL vs DuckDB" --free-tier --export
+
+# Output full JSON artifact payload to stdout
+uv run python main.py --query "Compare PostgreSQL vs DuckDB" --json
+```
+
+---
+
+### Mode 3: Containerized Docker Compose Deployment
+Package and run the entire application inside a reproducible Docker container with persistent volume mounts for telemetry and Obsidian vault storage:
+
+```bash
+# Build and start container in 1 command
 docker compose up --build
 ```
-Access the application at `http://localhost:8501`.
+Access the application dashboard at `http://localhost:8501`.
+
 
 ---
 
