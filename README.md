@@ -62,7 +62,7 @@ This project was built from the ground up to fulfill every requirement of the [D
                      |            |           |           |            |
                      v            v           v           v            v
                  OpenAI       Anthropic    Gemini     Perplexity      Grok
-                (gpt-4o)     (claude-3.5)  (flash)     (sonar)       (xai)
+                (gpt)        (claude)    (gemini)   (perplexity)  (grok)
                      |            |           |           |            |
                      +------------------------+------------------------+
                                               |
