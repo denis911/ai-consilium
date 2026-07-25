@@ -178,7 +178,7 @@ To run AI Consilium completely **free of charge ($0 API cost)** across 5 models:
    - 🏊 `poolside/laguna-s-2.1:free`
 
 > [!NOTE]
-> **Zero External API Keys for RAG:** The **DuckDB RAG Engine** (`council/rag.py`) runs 100% locally on CPU using embedded DuckDB and `sentence-transformers` (`all-MiniLM-L6-v2`). No external registration, cloud vector databases, or embedding API keys are required!
+> **Zero External API Keys for RAG & Local DuckDB Storage:** The **DuckDB RAG Engine** (`council/rag.py`) and Telemetry Logger (`council/telemetry.py`) run 100% locally using an embedded DuckDB database file (`ai_consilium.duckdb`). DuckDB automatically creates the file on first run. Database files (`*.duckdb`, `*.duckdb.wal`) are blocked by `.gitignore` to guarantee your research history and vector indices remain 100% private on your machine.
 
 
 

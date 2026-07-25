@@ -61,6 +61,11 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# DuckDB Database & Write-Ahead Logs
+*.duckdb
+*.duckdb.wal
+ai_consilium.duckdb
+
 # Flask stuff:
 instance/
 .webassets-cache
