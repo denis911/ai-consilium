@@ -24,11 +24,11 @@ DEFAULT_MODELS: List[str] = [
 
 # OpenRouter 100% free model tier fallback identifiers
 OPENROUTER_FREE_MODELS: List[str] = [
-    "openrouter/google/gemini-2.0-flash-exp:free",
-    "openrouter/deepseek/deepseek-r1:free",
-    "openrouter/meta-llama/llama-3.3-70b-instruct:free",
-    "openrouter/qwen/qwen-2.5-72b-instruct:free",
-    "openrouter/mistralai/mistral-small-24b-instruct-2501:free",
+    "openrouter/google/gemma-4-31b-it:free",
+    "openrouter/openai/gpt-oss-20b:free",
+    "openrouter/inclusionai/ling-3.0-flash:free",
+    "openrouter/cohere/north-mini-code:free",
+    "openrouter/poolside/laguna-s-2.1:free",
 ]
 
 PRIMARY_PROVIDER_KEYS: List[str] = [

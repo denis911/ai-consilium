@@ -162,11 +162,11 @@ To run AI Consilium completely **free of charge ($0 API cost)** across 5 models:
 2. **Generate Key:** Navigate to [openrouter.ai/keys](https://openrouter.ai/keys), click **"Create Key"**, and copy your generated key (`sk-or-v1-...`).
 3. **Save to `.env`:** Add `OPENROUTER_API_KEY=sk-or-v1-your-key` into your local `.env` file.
 4. **Automatic Free-Tier Routing:** When only `OPENROUTER_API_KEY` is set, AI Consilium automatically dispatches queries concurrently to 5 frontier free models:
-   - ⚡ `google/gemini-2.0-flash-exp:free`
-   - 🧠 `deepseek/deepseek-r1:free`
-   - 🦙 `meta-llama/llama-3.3-70b-instruct:free`
-   - 🌐 `qwen/qwen-2.5-72b-instruct:free`
-   - 💨 `mistralai/mistral-small-24b-instruct-2501:free`
+   - ⚡ `google/gemma-4-31b-it:free`
+   - 🧠 `openai/gpt-oss-20b:free`
+   - 🌐 `inclusionai/ling-3.0-flash:free`
+   - 💻 `cohere/north-mini-code:free`
+   - 🏊 `poolside/laguna-s-2.1:free`
 
 > [!NOTE]
 > **Zero External API Keys for RAG:** The **DuckDB RAG Engine** (`council/rag.py`) runs 100% locally on CPU using embedded DuckDB and `sentence-transformers` (`all-MiniLM-L6-v2`). No external registration, cloud vector databases, or embedding API keys are required!
