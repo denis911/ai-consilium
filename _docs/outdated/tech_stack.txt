@@ -1,0 +1,44 @@
+tech_stack.txt
+DATA LAYER ARCHITECTURE & COMPONENT BOUNDARIES:
+
++-------------------------------------------------------------+
+|                       MARIMO UI LAYER                       |
+|              (Reactive State DAG & Controls)                |
++-------------------------------------------------------------+
+|
+v
++-------------------------------------------------------------+
+|                       LOCAL DUCKDB                          |
+|  +-------------------------------------------------------+  |
+|  | FTS5 Keyword Indexing (BM25 Engine)                   |  |
+|  +-------------------------------------------------------+  |
+|  | Vector Embeddings Matrix Storage (FLOAT[] Columns)    |  |
+|  +-------------------------------------------------------+  |
++-------------------------------------------------------------+
+|
+v
++-------------------------------------------------------------+
+|                  PYDANTIC CONTRACT VALIDATOR                |
+|           (Strict Enforced JSON Schemas Output)             |
++-------------------------------------------------------------+
+|                  |                  |
+v                  v                  v
+[Gemini Pro]         [Claude 3.5]       [Perplexity]
+
+SPECIFICATION SCHEMAS:
+
+Hybrid Search Logic:
+Score = (w1 * BM25_Text_Rank) + (w2 * Cosine_Vector_Similarity)
+Executed via native DuckDB Array operations entirely in memory.
+
+Verification Contract Payload (Pydantic Interface):
+{
+"research_topic": "string",
+"consensus_verified_facts": ["string"],
+"contradictions_identified": [{"model": "string", "anomaly": "string"}],
+"technical_gantt_mermaid": "string",
+"systemic_confidence_score": "float (0.0 - 1.0)"
+}
+
+===============================================================================
+
