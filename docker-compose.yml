@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  ai-consilium:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-consilium-app
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    environment:
+      - OBSIDIAN_VAULT_PATH=/app/obsidian_vault
+    volumes:
+      - ./ai_consilium.duckdb:/app/ai_consilium.duckdb
+      - ${OBSIDIAN_VAULT_PATH:-./output_vault}:/app/obsidian_vault
+    restart: unless-stopped
