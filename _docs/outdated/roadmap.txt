@@ -1,0 +1,29 @@
+roadmap.txt
+TRACER-BULLET IMPLEMENTATION MILESTONES & BLOCKING PATHS:
+
+[PHASE 1: LOCAL DATA INFRASTRUCTURE]
+[ ] Task 1.1: Initialize Marimo reactive application workspace.
+[ ] Task 1.2: Build DuckDB file connector wrapper for local Obsidian Vault markdown logs.
+[ ] Task 1.3: Run PRAGMA create_fts_index over text content definitions.
+[ ] Task 1.4: Implement Cosine similarity array logic inside localized SQL execution.
+
+[PHASE 2: THE MULTI-MODEL INTEGRATION HARNESS]
+[ ] Task 2.1: Establish parallel client pool using httpx or native async endpoints.
+[ ] Task 2.2: Implement Pydantic target response schema structures.
+[ ] Task 2.3: Build the "Enforce, Don't Instruct" validation gate loop.
++------------------------------------------------------------+
+| LOOP: Check Model Result -> Valid Schema?                  |
+|       |---> YES: Pass to consensus stack                   |
+|       |---> NO: Raise system exception -> Terminate/Retry  |
++------------------------------------------------------------+
+
+[PHASE 3: CONSENSUS INTERROGATOR ENGINE]
+[ ] Task 3.1: Define Gemini Pro Judge system evaluation protocols.
+[ ] Task 3.2: Set up RRF (Reciprocal Rank Fusion) calculation loop inside notebook.
+[ ] Task 3.3: Map validated outputs to strict automated Markdown file templates.
+
+[PHASE 4: STREAMLINED UI AND DEPLOYMENT]
+[ ] Task 4.1: Render asynchronous UI progress elements natively in Marimo.
+[ ] Task 4.2: Finalize the "Commit to Vault" local safe file-system operations hook.
+[ ] Task 4.3: Export code execution tests to satisfy LLM Zoomcamp project standards.
+
