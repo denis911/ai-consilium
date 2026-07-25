@@ -9,6 +9,7 @@ dependencies = [
     "litellm>=1.0.0",
     "duckdb>=1.0.0",
     "sentence-transformers>=3.0.0",
+    "streamlit>=1.30.0",
 ]
 
 [dependency-groups]
