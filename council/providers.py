@@ -3,6 +3,7 @@ Asynchronous Multi-LLM Provider Engine for AI Consilium
 """
 
 import asyncio
+import os
 import time
 import logging
 from typing import List, Dict, Optional, Any
@@ -21,6 +22,23 @@ DEFAULT_MODELS: List[str] = [
     "xai/grok-2",
 ]
 
+# OpenRouter 100% free model tier fallback identifiers
+OPENROUTER_FREE_MODELS: List[str] = [
+    "openrouter/google/gemini-2.0-flash-exp:free",
+    "openrouter/deepseek/deepseek-r1:free",
+    "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+    "openrouter/qwen/qwen-2.5-72b-instruct:free",
+    "openrouter/mistralai/mistral-small-24b-instruct-2501:free",
+]
+
+PRIMARY_PROVIDER_KEYS: List[str] = [
+    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
+    "GEMINI_API_KEY",
+    "PERPLEXITY_API_KEY",
+    "XAI_API_KEY",
+]
+
 
 class LLMProviderEngine:
     """Manager for querying multiple LLM providers concurrently via LiteLLM."""
@@ -29,6 +47,31 @@ class LLMProviderEngine:
         self.default_timeout = default_timeout
         # Silence excessive verbose logs from litellm
         litellm.suppress_debug_info = True
+
+    def get_effective_models(
+        self,
+        requested_models: Optional[List[str]] = None,
+        use_free_tier: bool = False,
+    ) -> List[str]:
+        """
+        Determine target model list based on explicit parameters, free-tier flag,
+        or automatic detection of available API keys.
+        """
+        if requested_models:
+            return requested_models
+
+        if use_free_tier:
+            return OPENROUTER_FREE_MODELS
+
+        # Auto-detect: if OPENROUTER_API_KEY is present and no primary keys are configured
+        has_openrouter = bool(os.environ.get("OPENROUTER_API_KEY"))
+        has_primary_keys = any(bool(os.environ.get(key)) for key in PRIMARY_PROVIDER_KEYS)
+
+        if has_openrouter and not has_primary_keys:
+            logger.info("Only OPENROUTER_API_KEY detected. Auto-routing to OpenRouter free model tier.")
+            return OPENROUTER_FREE_MODELS
+
+        return DEFAULT_MODELS
 
     async def _query_single_provider(
         self,
@@ -40,6 +83,15 @@ class LLMProviderEngine:
         """Query a single LLM provider with latency tracking and error isolation."""
         timeout_val = timeout or self.default_timeout
         start_time = time.perf_counter()
+
+        # Add OpenRouter referrer headers if targeting an OpenRouter model
+        if model_name.startswith("openrouter/"):
+            headers = kwargs.get("extra_headers", {})
+            headers.update({
+                "HTTP-Referer": "https://github.com/denis911/ai-consilium",
+                "X-Title": "AI Consilium Dual-Engine Consensus Agent",
+            })
+            kwargs["extra_headers"] = headers
 
         try:
             response = await asyncio.wait_for(
@@ -108,9 +160,11 @@ class LLMProviderEngine:
         query_input: ConsiliumQueryInput,
         models: Optional[List[str]] = None,
         timeout: Optional[float] = None,
+        use_free_tier: bool = False,
     ) -> List[ModelResponsePayload]:
         """Query multiple models concurrently using asyncio.gather()."""
-        target_models = models or query_input.selected_models or DEFAULT_MODELS
+        requested_models = models or query_input.selected_models
+        target_models = self.get_effective_models(requested_models=requested_models, use_free_tier=use_free_tier)
 
         # Format system and user prompt with context if available
         user_content = query_input.query

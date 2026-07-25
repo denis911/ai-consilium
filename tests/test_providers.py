@@ -1,15 +1,15 @@
 import pytest
+import os
 import asyncio
 from unittest.mock import patch, MagicMock, AsyncMock
 from council.schemas import ConsiliumQueryInput, ModelResponsePayload
-from council.providers import LLMProviderEngine, DEFAULT_MODELS
+from council.providers import LLMProviderEngine, DEFAULT_MODELS, OPENROUTER_FREE_MODELS
 
 
 @pytest.mark.asyncio
 async def test_query_single_provider_success():
     engine = LLMProviderEngine(default_timeout=5.0)
 
-    # Mock response object from litellm.acompletion
     mock_choice = MagicMock()
     mock_choice.message.content = "DuckDB is a fast, embedded analytical database."
     mock_usage = MagicMock()
@@ -99,3 +99,48 @@ async def test_query_concurrently_mixed_results():
 
         assert claude_res.status == "error"
         assert "API unavailable" in claude_res.response_text
+
+
+def test_get_effective_models_selection():
+    engine = LLMProviderEngine()
+
+    # Explicit models requested
+    assert engine.get_effective_models(requested_models=["custom/model"]) == ["custom/model"]
+
+    # Explicit free tier requested
+    assert engine.get_effective_models(use_free_tier=True) == OPENROUTER_FREE_MODELS
+
+    # Auto-detection when only OPENROUTER_API_KEY is present
+    with patch.dict(os.environ, {"OPENROUTER_API_KEY": "sk-or-test"}, clear=True):
+        assert engine.get_effective_models() == OPENROUTER_FREE_MODELS
+
+    # Primary key present overrides default
+    with patch.dict(os.environ, {"OPENROUTER_API_KEY": "sk-or-test", "OPENAI_API_KEY": "sk-proj-test"}, clear=True):
+        assert engine.get_effective_models() == DEFAULT_MODELS
+
+
+@pytest.mark.asyncio
+async def test_openrouter_free_tier_query_execution():
+    engine = LLMProviderEngine(default_timeout=5.0)
+    query_input = ConsiliumQueryInput(query="Test OpenRouter fallback")
+
+    mock_resp = MagicMock()
+    mock_choice = MagicMock()
+    mock_choice.message.content = "OpenRouter free model answer"
+    mock_resp.choices = [mock_choice]
+    mock_resp.usage = MagicMock(prompt_tokens=15, completion_tokens=25)
+
+    with patch("litellm.acompletion", new_callable=AsyncMock) as mock_acompletion:
+        mock_acompletion.return_value = mock_resp
+
+        results = await engine.query_concurrently(query_input, use_free_tier=True)
+
+        assert len(results) == 5
+        assert all(r.status == "success" for r in results)
+        assert results[0].model_name == OPENROUTER_FREE_MODELS[0]
+        assert results[0].response_text == "OpenRouter free model answer"
+
+        # Verify extra headers were passed for OpenRouter models
+        call_kwargs = mock_acompletion.call_args.kwargs
+        assert "extra_headers" in call_kwargs
+        assert call_kwargs["extra_headers"]["X-Title"] == "AI Consilium Dual-Engine Consensus Agent"
