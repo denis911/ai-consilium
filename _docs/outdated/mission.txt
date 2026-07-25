@@ -1,0 +1,30 @@
+mission.txt
+PROJECT NAME: Dual-Engine Consensus Research Agent (DECRA)
+MISSION STATEMENT:
+To eliminate AI hallucination, bias, and context drift in high-stakes domain research by establishing a deterministic software harness that cross-examines multiple frontier LLMs against an unalterable local specification, verifying facts via algorithmic consensus before indexing the validated data into a local knowledge graph.
+
+CORE PROBLEM:
++-------------------------------------------------------------------------+
+| Single LLM Output -> Hallucinations -> Business/Legal Risk (Slop Code)  |
++-------------------------------------------------------------------------+
+
+SDD SOLUTION HARNESS:
++-------------+      +-------------------+      +-------------------------+
+| Input Query | ---> | 4-5 Parallel LLMs | ---> | Gemini Pro Consensus    |
++-------------+      +-------------------+      +-------------------------+
+|
+v
++-------------+      +-------------------+      +-------------------------+
+| Local Wiki  | <--- | Strict JSON Spec  | <--- | Fact & Schema Validator |
++-------------+      +-------------------+      +-------------------------+
+
+TARGET BUSINESS APPLICATIONS:
+
+Legal, Tax, and Corporate Compliance: Verification of localized accounting rules.
+
+Architecture and Systems Decisions: Validating cloud infrastructure topologies for redundancy.
+
+Market Discovery and PMF: Automated pattern matching across competitive analysis.
+
+===============================================================================
+
