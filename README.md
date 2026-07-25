@@ -176,6 +176,3 @@ This project strictly adheres to **Spec-Driven Design (SDD)** principles:
 3. **Automated Testing & DoD:** Definition of Done requires unit test pass rates and verification before landing features.
 
 ---
-
-## 📜 License
-MIT License. Created by Denis Kuramshin for LLM Zoomcamp 2026.
