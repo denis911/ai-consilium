@@ -168,6 +168,10 @@ To run AI Consilium completely **free of charge ($0 API cost)** across 5 models:
    - 🌐 `qwen/qwen-2.5-72b-instruct:free`
    - 💨 `mistralai/mistral-small-24b-instruct-2501:free`
 
+> [!NOTE]
+> **Zero External API Keys for RAG:** The **DuckDB RAG Engine** (`council/rag.py`) runs 100% locally on CPU using embedded DuckDB and `sentence-transformers` (`all-MiniLM-L6-v2`). No external registration, cloud vector databases, or embedding API keys are required!
+
+
 
 ### 2. Run Locally with `uv`
 ```bash
