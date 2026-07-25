@@ -62,7 +62,6 @@ This project was built from the ground up to fulfill every requirement of the [D
                      |            |           |           |            |
                      v            v           v           v            v
                  OpenAI       Anthropic    Gemini     Perplexity      Grok
-                (gpt)        (claude)    (gemini)   (perplexity)  (grok)
                      |            |           |           |            |
                      +------------------------+------------------------+
                                               |
