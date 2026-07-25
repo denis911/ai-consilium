@@ -149,8 +149,17 @@ GEMINI_API_KEY=your_key_here
 PERPLEXITY_API_KEY=your_key_here
 XAI_API_KEY=your_key_here
 
-OBSIDIAN_VAULT_PATH=C:/Users/YourName/Documents/ObsidianVault
+# Local Knowledge Base / Obsidian Vault Path (Set to your local folder)
+OBSIDIAN_VAULT_PATH=C:/ai-memory/ai-concilium
 ```
+
+### 📁 Setting Up Your Local Obsidian Vault / Memory Folder
+
+AI Consilium exports consensus research notes directly to your local knowledge base:
+- **Windows Example:** `OBSIDIAN_VAULT_PATH=C:/ai-memory/ai-concilium`
+- **macOS / Linux Example:** `OBSIDIAN_VAULT_PATH=/Users/username/Obsidian/Vault`
+
+If the directory does not exist yet, AI Consilium automatically creates it when saving your first note!
 
 ---
 
