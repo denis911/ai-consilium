@@ -10,7 +10,7 @@ To eliminate AI hallucination, bias, and context drift in high-stakes domain res
 
 ## SDD Architecture Overview
 1. **RAG Knowledge Retrieval Engine (DuckDB):** Ingests local Obsidian notes / reference docs into an embedded DuckDB vector store (VSS extension + FTS keyword search) for fast, zero-dependency local hybrid search.
-2. **Multi-Model Querying Engine:** Asynchronously queries 5 frontier LLMs (OpenAI, Anthropic, Gemini, Perplexity, Grok) with retrieved RAG context.
+2. **Multi-Model Querying Engine (LiteLLM + OpenRouter Fallback):** Asynchronously queries 5 frontier LLMs (OpenAI, Anthropic, Gemini, Perplexity, Grok) concurrently via LiteLLM using individual provider keys, with seamless zero-cost fallback to 5 OpenRouter free-tier models (`:free`) for $0 testing.
 3. **Hybrid Consensus & Contradiction Synthesizer:** Computes pairwise semantic embedding similarity across responses to generate a mathematical Consensus Score (0–100%) and detect statistical outliers, followed by an LLM-as-a-Judge qualitative synthesis.
 4. **Structured Artifact Generator:** Generates structured schemas, markdown documents, and dynamic Mermaid.js visualizations (e.g., Gantt charts, architecture diagrams).
 5. **Dual Interface & Obsidian Exporter:** Streamlit interactive web dashboard (real-time progress, gauge metrics, Mermaid rendering, vault export) + command-line CLI.

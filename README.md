@@ -17,7 +17,7 @@
 Solopreneurs cannot afford $500/hr corporate retainers to cross-check architecture choices or localized tax compliance. However, a single critical hallucination from a standard single-LLM ChatGPT window can derail cloud infrastructure or lead to costly legal errors.
 
 ### The Solution
-AI Consilium transforms unpredictable LLM outputs into an **auditable multi-model consensus engine**. It asynchronously queries **5 frontier LLM providers** (OpenAI, Anthropic, Gemini, Perplexity, Grok) with retrieved local reference context, calculates a mathematical **Consensus Score (0–100%)** via embedding distance, identifies statistical outliers, runs an LLM-as-a-Judge qualitative synthesis, renders dynamic **Mermaid.js visualizations**, and exports verified notes directly into a local **Obsidian vault**.
+AI Consilium transforms unpredictable LLM outputs into an **auditable multi-model consensus engine**. Powered by **LiteLLM**, it asynchronously queries **5 frontier LLM providers** (OpenAI, Anthropic, Gemini, Perplexity, Grok) with retrieved local reference context. For zero-cost local testing, it includes a 1-click fallback to 5 free models on OpenRouter (`:free`). It calculates a mathematical **Consensus Score (0–100%)** via embedding distance, identifies statistical outliers, runs an LLM-as-a-Judge qualitative synthesis, renders dynamic **Mermaid.js visualizations**, and exports verified notes directly into a local **Obsidian vault**.
 
 ---
 

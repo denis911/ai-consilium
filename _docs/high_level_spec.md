@@ -60,8 +60,9 @@
 2. **RAG Knowledge Retrieval Engine (DuckDB):**
    - Uses embedded **DuckDB** with Vector Search (`vss`) and Full-Text Search (`fts`) extensions for fast, local-first hybrid retrieval.
 
-3. **Multi-Model Querying Engine:**
-   - Asynchronous Python engine hitting 5 frontier LLMs concurrently: OpenAI, Anthropic, Gemini, Perplexity, and Grok.
+3. **Multi-Model Querying Engine (LiteLLM + OpenRouter Fallback):**
+   - Asynchronous Python engine hitting 5 frontier LLMs concurrently using **LiteLLM**: OpenAI, Anthropic, Gemini, Perplexity, and Grok.
+   - **Zero-Cost Free Tier Support:** Includes built-in support for OpenRouter's 100% free model tier (`:free`), allowing $0 local testing across 5 free models (Gemini 2.0 Flash, DeepSeek R1, Llama 3.3 70B, Qwen 2.5 72B, Mistral Small) using a single OpenRouter API key.
 
 4. **Hybrid Consensus & Contradiction Synthesizer:**
    - Calculates numerical pairwise cosine embedding similarity to compute a **Consensus Score (0–100%)** and identify statistical outliers.
