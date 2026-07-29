@@ -225,3 +225,6 @@ __marimo__/
 # output vault
 output_vault/
 
+# review folder
+_docs/review/
+
