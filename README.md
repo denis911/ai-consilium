@@ -233,3 +233,23 @@ This project strictly adheres to **Spec-Driven Design (SDD)** principles:
 3. **Automated Testing & DoD:** Definition of Done requires unit test pass rates and verification before landing features.
 
 ---
+
+## 🐶 Dogfooding AI Consilium: Verify Our Key Architecture Decisions
+
+We built **AI Consilium** by dogfooding our own consensus engine to evaluate every core architectural trade-off!
+
+If you want to see **AI Consilium** in action and experience its practical value firsthand, try running these benchmark queries in the **Streamlit Web UI** (`app.py`) or **CLI Mode** (`main.py`):
+
+| Architecture Decision Under Audit | Benchmark Consensus Query to Try | Winning Architecture Choice |
+| :--- | :--- | :--- |
+| **1. Embedded RAG DB** | `"Compare embedded DuckDB (VSS + FTS) vs PostgreSQL (pgvector) for zero-dependency local desktop RAG search"` | **DuckDB:** Zero server setup, fast in-process hybrid search (`vss` + `fts`), 100% local data privacy. |
+| **2. Multi-Model Provider Engine** | `"Compare LiteLLM with OpenRouter fallback vs LangChain for asynchronous multi-LLM consensus querying"` | **LiteLLM:** Lightweight, clean async `litellm.acompletion()` with 1-click $0 OpenRouter free model fallback. |
+| **3. Offline Embedding Engine** | `"Compare local SentenceTransformers (all-MiniLM-L6-v2) vs OpenAI text-embedding-3-small for local CPU RAG cost and privacy"` | **SentenceTransformers:** $0 API fees, 384-d dense vectors, fast offline CPU inference (<50ms). |
+| **4. Note Export & Visualizations** | `"Compare Obsidian Markdown vault storage with Mermaid.js vs cloud Notion API for local-first knowledge bases"` | **Obsidian + Mermaid.js:** Clean Markdown with YAML frontmatter, zero vendor lock-in, dynamic chart rendering. |
+
+### 🧪 Try it in CLI mode right now:
+```bash
+uv run python main.py --query "Compare embedded DuckDB (VSS + FTS) vs PostgreSQL (pgvector) for zero-dependency local desktop RAG search" --free-tier --export
+```
+*(This asynchronously queries 5 free models concurrently, calculates the numerical Consensus Score, generates a Mermaid.js diagram, and exports a formatted note directly to your local vault folder!)*
+
