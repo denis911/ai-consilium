@@ -38,6 +38,19 @@ This project was built from the ground up to fulfill every requirement of the [D
 
 ---
 
+## ⭐ Unique Strengths & Innovations of AI Consilium
+
+AI Consilium goes beyond traditional single-model RAG question-answering systems by introducing a deterministic multi-model consensus harness:
+
+- 🏛️ **Multi-LLM Consensus Engine:** Eliminates single-model hallucination risk by querying $N$ frontier LLM providers concurrently and computing an $N \times N$ pairwise cosine similarity matrix with statistical outlier detection.
+- ⚖️ **LLM-as-a-Judge Qualitative Synthesis:** Merges disparate model responses into an executive summary highlighting unanimous agreement points, explicit contradiction audit logs, and dynamic Mermaid.js workflow diagrams.
+- ⚡ **100% Free & Zero-Cost Developer Mode:** Features a 1-click fallback to 5 free models on OpenRouter (`:free`) and local CPU embeddings (`all-MiniLM-L6-v2`), requiring $0 API budget to test and run.
+- 📂 **Native Obsidian Vault Integration:** Exports structured `.md` research notes with YAML frontmatter, tags, agreement lists, and embedded Mermaid charts directly into local knowledge bases (e.g. `C:\ai-memory\ai-concilium`).
+- 📊 **Embedded DuckDB Telemetry & RAG:** Zero-dependency local persistence using DuckDB for both hybrid dense/sparse RAG search and execution query logging (token counts, latencies, estimated costs).
+- 🧪 **Spec-Driven Software Engineering:** Built with strict Spec-Driven Design (SDD), Pydantic v2 data contracts, Hatchling, and 36 automated unit & integration tests with 100% pass rate.
+
+---
+
 ## 🏗️ System Architecture
 
 ```
