@@ -20,6 +20,12 @@ Solopreneurs cannot afford $500/hr corporate retainers to cross-check architectu
 ### The Solution
 AI Consilium transforms unpredictable LLM outputs into an **auditable multi-model consensus engine**. Powered by **LiteLLM**, it asynchronously queries **5 frontier LLM providers** (OpenAI, Anthropic, Gemini, Perplexity, Grok) with retrieved local reference context. For zero-cost local testing, it includes a 1-click fallback to 5 free models on OpenRouter (`:free`). It calculates a mathematical **Consensus Score (0–100%)** via 384-dimensional embedding distance, identifies statistical Z-score outliers, runs an LLM-as-a-Judge qualitative synthesis, renders dynamic **Mermaid.js visualizations**, logs telemetry in DuckDB, and exports verified notes directly into a local **Obsidian vault**.
 
+### 💡 Project Origin & Personal Motivation
+While the concept of multi-LLM consensus (known in AI research as *Multi-Agent Debate (MAD)* or *Mixture-of-Agents (MoA)*) is an established architectural pattern, **AI Consilium was created out of two real-world motivations:**
+
+1. **Scratching My Own Itch:** I spent endless hours manually cross-validating code, architecture patterns, and technical decisions by copy-pasting questions across ChatGPT, Claude, and Gemini tabs back and forth. Managing scattered answers manually became unsustainable, making an automated multi-model consensus harness and local knowledge base finally inevitable.
+2. **Applying LLM Zoomcamp in Real Life:** I wanted to take the core engineering concepts learned throughout DataTalksClub's LLM Zoomcamp (RAG retrieval, vector search, evaluation metrics, telemetry, and LiteLLM integration) and synthesize them into a practical, production-grade tool for daily engineering workflows.
+
 ---
 
 ## 📊 Evaluator Fast-Track: LLM Zoomcamp Capstone Scoring Matrix
