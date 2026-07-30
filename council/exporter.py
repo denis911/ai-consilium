@@ -13,6 +13,20 @@ from council.schemas import ConsiliumFinalArtifact
 
 logger = logging.getLogger(__name__)
 
+VALID_MERMAID_TOKENS = (
+    "graph",
+    "flowchart",
+    "sequencediagram",
+    "classdiagram",
+    "statediagram",
+    "erdiagram",
+    "gantt",
+    "pie",
+    "mindmap",
+    "gitgraph",
+    "architecture",
+)
+
 
 class ObsidianExporter:
     """Exporter for saving Consilium research artifacts as structured Markdown notes in an Obsidian vault."""
@@ -28,6 +42,13 @@ class ObsidianExporter:
         clean = re.sub(r"[^\w\s-]", "", clean)
         clean = re.sub(r"[\s_]+", "-", clean)
         return clean or "consensus-research-report"
+
+    def _is_valid_mermaid(self, mermaid_code: str) -> bool:
+        """Check if mermaid_code begins with a recognized diagram type token."""
+        if not mermaid_code or not mermaid_code.strip():
+            return False
+        first_line = mermaid_code.strip().splitlines()[0].strip().lower()
+        return any(first_line.startswith(token) for token in VALID_MERMAID_TOKENS)
 
     def format_markdown(self, artifact: ConsiliumFinalArtifact) -> str:
         """Format ConsiliumFinalArtifact into a clean Markdown document with YAML frontmatter."""
@@ -70,20 +91,21 @@ class ObsidianExporter:
         else:
             md_body += "- *Zero contradictions detected across model ensemble.*\n\n"
 
-        # Mermaid Diagram Section
-        if artifact.mermaid_code and artifact.mermaid_code.strip():
+        # Mermaid Diagram Section (with token syntax validation)
+        if artifact.mermaid_code and self._is_valid_mermaid(artifact.mermaid_code):
             md_body += "## 📊 Consensus Architecture & Process Flow\n"
             md_body += "```mermaid\n"
             md_body += f"{artifact.mermaid_code.strip()}\n"
             md_body += "```\n\n"
 
-        # Individual Model Raw Responses Section
+        # Individual Model Raw Responses Section (escaping code fences)
         if artifact.responses:
             md_body += "## 🔍 Multi-Model Raw Provider Responses\n"
             for resp in artifact.responses:
+                escaped_text = resp.response_text.replace("```", "~~~")
                 md_body += f"<details>\n"
                 md_body += f"<summary><b>{resp.model_name}</b> (Status: <code>{resp.status}</code>, Latency: <code>{resp.latency_ms:.1f}ms</code>)</summary>\n\n"
-                md_body += f"```text\n{resp.response_text}\n```\n"
+                md_body += f"```text\n{escaped_text}\n```\n"
                 md_body += f"</details>\n\n"
 
         return yaml_frontmatter + md_body
@@ -98,13 +120,17 @@ class ObsidianExporter:
         Returns the absolute string path of the created file.
         """
         target_dir_str = vault_path or self.default_vault_path
-        target_dir = Path(target_dir_str)
+        target_dir = Path(target_dir_str).resolve()
         target_dir.mkdir(parents=True, exist_ok=True)
 
         date_prefix = datetime.datetime.now().strftime("%Y-%m-%d")
         safe_title = self._sanitize_filename(artifact.obsidian_title or artifact.query)
         filename = f"{date_prefix}-{safe_title}.md"
-        target_file = target_dir / filename
+        target_file = (target_dir / filename).resolve()
+
+        # Path traversal security check
+        if not str(target_file).startswith(str(target_dir)):
+            raise ValueError(f"Unsafe export path resolved outside vault: {target_file}")
 
         content = self.format_markdown(artifact)
 
@@ -113,5 +139,5 @@ class ObsidianExporter:
         tmp_file.write_text(content, encoding="utf-8")
         tmp_file.replace(target_file)
 
-        logger.info(f"Successfully exported Consilium artifact note to: {target_file}")
-        return str(target_file.resolve())
+        logger.info(f"Exported Consilium research note to {target_file}")
+        return str(target_file)

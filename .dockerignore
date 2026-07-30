@@ -1,0 +1,22 @@
+# Exclude sensitive environment variables and credentials
+.env
+.env.local
+
+# Exclude Git files
+.git
+.gitignore
+
+# Exclude DuckDB local databases & WAL files
+*.duckdb
+*.duckdb.wal
+
+# Exclude virtual environments & caches
+.venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+
+# Exclude local output vaults and scratch artifacts
+output_vault
+_docs/scratch*
