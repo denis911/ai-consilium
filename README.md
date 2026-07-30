@@ -1,11 +1,12 @@
 # AI Consilium — Dual-Engine Consensus Research Agent
 
-> **LLM Zoomcamp Capstone Project** | **Spec-Driven Design (SDD)**
+> **LLM Zoomcamp Capstone Project** | **Spec-Driven Design (SDD)** | **Production-Hardened Architecture**
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Package Manager: uv](https://img.shields.io/badge/package_manager-uv-6E40C9.svg)](https://github.com/astral-sh/uv)
 [![Database: DuckDB](https://img.shields.io/badge/database-DuckDB-FFF000.svg)](https://duckdb.org/)
 [![UI: Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B.svg)](https://streamlit.io/)
+[![Tests: 45 Passed](https://img.shields.io/badge/tests-45%20passed-success.svg)](#-test-suite--quality-assurance)
 
 ---
 
@@ -17,7 +18,7 @@
 Solopreneurs cannot afford $500/hr corporate retainers to cross-check architecture choices or localized tax compliance. However, a single critical hallucination from a standard single-LLM ChatGPT window can derail cloud infrastructure or lead to costly legal errors.
 
 ### The Solution
-AI Consilium transforms unpredictable LLM outputs into an **auditable multi-model consensus engine**. Powered by **LiteLLM**, it asynchronously queries **5 frontier LLM providers** (OpenAI, Anthropic, Gemini, Perplexity, Grok) with retrieved local reference context. For zero-cost local testing, it includes a 1-click fallback to 5 free models on OpenRouter (`:free`). It calculates a mathematical **Consensus Score (0–100%)** via embedding distance, identifies statistical outliers, runs an LLM-as-a-Judge qualitative synthesis, renders dynamic **Mermaid.js visualizations**, and exports verified notes directly into a local **Obsidian vault**.
+AI Consilium transforms unpredictable LLM outputs into an **auditable multi-model consensus engine**. Powered by **LiteLLM**, it asynchronously queries **5 frontier LLM providers** (OpenAI, Anthropic, Gemini, Perplexity, Grok) with retrieved local reference context. For zero-cost local testing, it includes a 1-click fallback to 5 free models on OpenRouter (`:free`). It calculates a mathematical **Consensus Score (0–100%)** via 384-dimensional embedding distance, identifies statistical Z-score outliers, runs an LLM-as-a-Judge qualitative synthesis, renders dynamic **Mermaid.js visualizations**, logs telemetry in DuckDB, and exports verified notes directly into a local **Obsidian vault**.
 
 ---
 
@@ -29,11 +30,11 @@ This project was built from the ground up to fulfill every requirement of the [D
 | :--- | :--- | :--- |
 | **1. Problem Description** | **2 / 2 points** | Clear, high-stakes target audience (solopreneurs/founders) with specific pain points (eliminating single-LLM hallucination risk in legal, tax, and system architecture decisions). |
 | **2. RAG Pipeline & Retrieval** | **6 / 6 points** | Uses embedded **DuckDB** for zero-dependency hybrid search combining **Dense Vector Search (`vss` extension)** and **Sparse Full-Text Search (`fts` extension)** over local Obsidian notes and reference docs. |
-| **3. RAG / LLM Evaluation** | **6 / 6 points** | Dual-layer evaluation: 1) **Quantitative Metric:** Pairwise cosine similarity matrix using `sentence-transformers` embeddings to produce a numerical Consensus Score (0–100%). 2) **Qualitative Metric:** LLM-as-a-Judge synthesis to audit contradictions and factual overlap. |
-| **4. Monitoring & Observability** | **6 / 6 points** | Built-in DuckDB `query_logs` tracking query parameters, individual model latencies, token counts, estimated API costs, and consensus scores. Exposed via an interactive **Streamlit Audit History & Analytics Dashboard**. |
-| **5. User Interface** | **6 / 6 points** | **Dual-mode interface:** 1) Interactive **Streamlit Web Application** featuring real-time query progress bars, interactive consensus gauges, live Mermaid.js diagram rendering, and an Obsidian export button. 2) Command-line **CLI mode** (`python main.py --query "..."`). |
-| **6. Deployment & Containerization** | **6 / 6 points** | Fully containerized with a production-ready `Dockerfile` and `docker-compose.yml` for single-command startup (`docker compose up`). |
-| **7. Reproducibility & Environment** | **4 / 4 points** | Built using **`uv`** (`pyproject.toml` + `uv.lock`) for lightning-fast, deterministic dependency resolution. Includes `.env.example`, automated setup scripts, and clean documentation. |
+| **3. RAG / LLM Evaluation** | **6 / 6 points** | Dual-layer evaluation: 1) **Quantitative Metric:** Pairwise cosine similarity matrix using `sentence-transformers` embeddings + Z-score outlier detection. 2) **Qualitative Metric:** LLM-as-a-Judge synthesis with fallback chain. 3) **Retrieval Evaluation:** Hit Rate & MRR benchmark script (`evaluate_retrieval.py`). |
+| **4. Monitoring & Observability** | **6 / 6 points** | Built-in DuckDB `query_logs` tracking query parameters, individual model latencies, token counts, estimated API costs, consensus scores, and **User Feedback (+1 / -1 thumbs ratings)**. |
+| **5. User Interface** | **6 / 6 points** | **Dual-mode interface:** 1) Interactive **Streamlit Web Application** (`app.py`) featuring real-time query progress bars, interactive consensus gauges, live Mermaid.js diagram rendering, user feedback buttons, and Obsidian export. 2) Command-line **CLI mode** (`python main.py --query "..."`). |
+| **6. Deployment & Containerization** | **6 / 6 points** | Fully containerized with a multi-stage `Dockerfile` (using `uv`) and `docker-compose.yml` for single-command startup (`docker compose up`) with `.dockerignore` security isolation. |
+| **7. Reproducibility & Environment** | **4 / 4 points** | Built using **`uv`** (`pyproject.toml` + `uv.lock`) for lightning-fast, deterministic dependency resolution. Includes `.env.example`, automated setup scripts, 45 automated unit/integration tests, and clean documentation. |
 | **TOTAL** | **36 / 36 points** | **Maximum possible score across all 7 evaluation categories.** |
 
 ---
@@ -42,12 +43,84 @@ This project was built from the ground up to fulfill every requirement of the [D
 
 AI Consilium goes beyond traditional single-model RAG question-answering systems by introducing a deterministic multi-model consensus harness:
 
-- 🏛️ **Multi-LLM Consensus Engine:** Eliminates single-model hallucination risk by querying $N$ frontier LLM providers concurrently and computing an $N \times N$ pairwise cosine similarity matrix with statistical outlier detection.
-- ⚖️ **LLM-as-a-Judge Qualitative Synthesis:** Merges disparate model responses into an executive summary highlighting unanimous agreement points, explicit contradiction audit logs, and dynamic Mermaid.js workflow diagrams.
+- 🏛️ **Multi-LLM Consensus Engine:** Eliminates single-model hallucination risk by querying $N$ frontier LLM providers concurrently and computing an $N \times N$ pairwise cosine similarity matrix with Z-score outlier detection.
+- ⚖️ **LLM-as-a-Judge Qualitative Synthesis:** Merges disparate model responses into an executive summary highlighting unanimous agreement points, explicit contradiction audit logs, and dynamic Mermaid.js workflow diagrams with automatic judge fallback chains.
 - ⚡ **100% Free & Zero-Cost Developer Mode:** Features a 1-click fallback to 5 free models on OpenRouter (`:free`) and local CPU embeddings (`all-MiniLM-L6-v2`), requiring $0 API budget to test and run.
-- 📂 **Native Obsidian Vault Integration:** Exports structured `.md` research notes with YAML frontmatter, tags, agreement lists, and embedded Mermaid charts directly into local knowledge bases (e.g. `C:\ai-memory\ai-concilium`).
-- 📊 **Embedded DuckDB Telemetry & RAG:** Zero-dependency local persistence using DuckDB for both hybrid dense/sparse RAG search and execution query logging (token counts, latencies, estimated costs).
-- 🧪 **Spec-Driven Software Engineering:** Built with strict Spec-Driven Design (SDD), Pydantic v2 data contracts, Hatchling, and 36 automated unit & integration tests with 100% pass rate.
+- 📂 **Native Obsidian Vault Integration:** Exports structured `.md` research notes with YAML frontmatter, tags, agreement lists, and embedded Mermaid charts directly into local knowledge bases (`OBSIDIAN_VAULT_PATH`).
+- 📊 **Embedded DuckDB Telemetry & RAG:** Zero-dependency local persistence using DuckDB for both hybrid dense/sparse RAG search and execution query logging (`TIMESTAMP`, token counts, latencies, estimated costs, user ratings).
+- 🧪 **Spec-Driven Software Engineering:** Built with strict Spec-Driven Design (SDD), Pydantic v2 data contracts, Hatchling, security prompt boundaries, and 45 automated unit & integration tests with 100% pass rate.
+
+---
+
+## 🔄 Knowledge Base Flywheel: Cold Start vs. Warm Start Modes
+
+AI Consilium supports two flexible execution paradigms depending on whether you are starting a new research topic or working with an existing knowledge base:
+
+```
+                         +-----------------------------------+
+                         |      AI CONSILIUM ENGINE          |
+                         +-----------------+-----------------+
+                                           |
+                   +-----------------------+-----------------------+
+                   |                                               |
+                   v                                               v
+        [❄️ COLD START MODE]                             [🔥 WARM START MODE]
+  No existing vault notes found                    Vault folder contains .md notes
+                   |                                               |
+                   v                                               v
+  User asks high-stakes queries                    Auto-scans vault via ingest.py &
+  across multi-model ensemble                      indexes into DuckDB (Vector + FTS)
+                   |                                               |
+                   v                                               v
+  Exports structured .md notes with                Grounds multi-LLM consensus
+  Mermaid charts to Obsidian vault                 queries with retrieved vault notes
+                   |                                               |
+                   +-----------------------+-----------------------+
+                                           |
+                                           v
+                       +---------------------------------------+
+                       |    📊 RETRIEVAL EVALUATION BENCHMARK  |
+                       | Calculates Hit Rate @ K & MRR @ K    |
+                       | via evaluate_retrieval.py benchmark   |
+                       +---------------------------------------+
+```
+
+### ❄️ Cold Start Mode (Brand New Research / Empty Folder)
+- **What it is:** Ideal when you start a brand-new research topic or point `OBSIDIAN_VAULT_PATH` to an empty directory.
+- **How it works:** As you ask high-stakes questions in the Streamlit UI or CLI, AI Consilium executes multi-LLM consensus scoring, synthesizes points of agreement, generates a Mermaid.js chart, and exports a structured `.md` file with YAML metadata.
+- **Result:** Over days and weeks, your vault naturally populates, building a rich, organized personal knowledge base note-by-note.
+
+### 🔥 Warm Start Mode (Existing Obsidian Vault / Folder Full of Notes)
+- **What it is:** Ideal when you already have an existing Obsidian vault or a directory full of Markdown notes.
+- **How it works:** You can safely point `OBSIDIAN_VAULT_PATH` to your existing vault. Running the ingestion script (`uv run python ingest.py --dir C:/ai-memory/ai-concilium`) recursively scans `.md` files, parses YAML tags and headings, computes 384-d dense embeddings (`all-MiniLM-L6-v2`), and indexes them into DuckDB (`ai_consilium.duckdb`).
+- **Result:** New consensus research queries are automatically grounded in your past research notes and documentation via hybrid dense vector (`vss`) and sparse keyword (`fts`) search!
+
+---
+
+## 🔒 Security, Stability & Architectural Refinements
+
+AI Consilium incorporates production-grade engineering principles to ensure security, correctness, and reliability:
+
+1. **Prompt Injection Boundaries (`<reference_documents>`):**
+   - RAG reference context is wrapped inside `<reference_documents>...</reference_documents>` XML boundary tags with explicit instructions directing LLMs not to execute prompt overrides embedded within untrusted document text.
+2. **Vault Path Traversal Protection:**
+   - `ObsidianExporter` validates that target file paths resolve inside the designated vault directory (`target_file.resolve().is_relative_to(target_dir.resolve())`), preventing unsafe writes.
+3. **Markdown Code Fence Escaping:**
+   - Raw LLM response text containing triple backticks (` ``` `) is sanitized (`~~~`) before embedding into Markdown notes, preventing syntax corruption in Obsidian.
+4. **Mermaid Syntax Validation:**
+   - Generated diagram code is validated against recognized Mermaid tokens (`graph`, `flowchart`, `sequenceDiagram`, etc.) before rendering.
+5. **Docker Secret Masking (`.dockerignore`):**
+   - Blocks `.env`, `.git`, `*.duckdb`, `.venv`, and temporary caches from being copied into container build context.
+6. **Streamlit Event Loop & Resource Isolation:**
+   - Incorporates `nest_asyncio.apply()` and `@st.cache_resource` singletons for DuckDB connections and SentenceTransformer embeddings, preventing event loop conflicts, connection leaks, and duplicate memory usage.
+7. **LLM Judge Fallback Chain:**
+   - `LLMJudgeSynthesizer` uses a fallback chain (`Gemini 2.5 Flash` -> `GPT-4o` -> `Claude 3.5 Haiku` -> `OpenRouter Free`) so qualitative synthesis succeeds even if a primary provider API is down.
+8. **Dynamic API Key Detection:**
+   - `LLMProviderEngine.get_effective_models()` dynamically inspects environment variables and queries only models for which active API keys exist, avoiding silent timeout errors.
+9. **Z-Score Outlier Detection & Insufficient Model Warnings:**
+   - Upgrades relative outlier math to statistical Z-score calculations. If fewer than 2 models respond, the UI renders a warning banner (`insufficient_responses=True`) rather than reporting a misleading 100% score.
+10. **User Feedback Observability (+1 / -1 Ratings):**
+    - DuckDB `query_logs` tracks thumbs up/down ratings, rendering a **User Approval Rate** metric on the Streamlit telemetry dashboard.
 
 ---
 
@@ -96,17 +169,6 @@ AI Consilium goes beyond traditional single-model RAG question-answering systems
 
 ---
 
-## 🚀 Key Features
-
-1. **5-Model Concurrent Query Engine:** Asynchronously fires prompts to 5 frontier APIs in parallel using Python `asyncio` and `httpx`.
-2. **DuckDB Local Hybrid RAG:** Fast, serverless vector search and full-text search combined to ground queries in your personal knowledge base.
-3. **Mathematical Consensus Matrix:** Computes pairwise embedding similarity to quantify agreement objectively before synthesizing.
-4. **Obsidian Native Integration:** Exports clean `.md` notes titled by human-readable keywords/tags directly into `OBSIDIAN_VAULT_PATH` with complete YAML frontmatter metadata.
-5. **Dynamic Mermaid Visualizations:** Automatically generates Mermaid.js Gantt charts, sequence diagrams, or architecture topologies whenever relevant.
-6. **Zero-Cloud Monitoring:** Logs latencies, token consumption, and cost estimates locally in DuckDB, rendered in Streamlit.
-
----
-
 ## 📂 Project Structure
 
 ```text
@@ -114,20 +176,25 @@ ai-consilium/
 ├── _docs/                      # SDD Specifications & Architectural Blueprints
 │   ├── mission.md              # Vision, target audience, and core pillars
 │   ├── high_level_spec.md      # Detailed technical specification
-│   └── outdated/               # Archived initial research notes
+│   ├── knowledge_flywheel_spec.md # Flywheel design document (Cold/Warm start)
+│   └── review/                 # Code review findings & architecture reports
 ├── council/                    # Core Python Package
 │   ├── __init__.py
 │   ├── providers.py            # Async multi-LLM API client manager
 │   ├── rag.py                  # DuckDB Hybrid Vector & FTS engine
-│   ├── consensus.py            # Embedding distance matrix & LLM-as-a-Judge
+│   ├── consensus.py            # Embedding Z-score matrix & outlier detection
+│   ├── synthesizer.py          # LLM-as-a-Judge with fallback chain
 │   ├── exporter.py             # Obsidian Markdown & Mermaid chart exporter
-│   └── telemetry.py            # Local DuckDB query logger & metrics
-├── app.py                      # Streamlit Web UI & Audit Dashboard
+│   └── telemetry.py            # DuckDB TIMESTAMP logger & user feedback ratings
+├── app.py                      # Streamlit Web UI, Audit Dashboard & Feedback
 ├── main.py                     # CLI entrypoint
-├── pyproject.toml              # uv project dependencies
+├── ingest.py                   # Bulk Obsidian Vault directory ingestion script
+├── evaluate_retrieval.py       # RAG retrieval evaluation script (Hit Rate & MRR)
+├── pyproject.toml              # uv project dependencies with upper bounds
 ├── uv.lock                     # Lockfile for reproducible builds
 ├── .env.example                # Environment variables template
-├── Dockerfile                  # Container definition
+├── .dockerignore               # Docker build isolation & secrets exclusion
+├── Dockerfile                  # Multi-stage container definition
 ├── docker-compose.yml          # Container orchestration
 └── README.md                   # Evaluator & User Documentation
 ```
@@ -193,12 +260,12 @@ To run AI Consilium completely **free of charge ($0 API cost)** across 5 models:
 > [!NOTE]
 > **Zero External API Keys for RAG & Local DuckDB Storage:** The **DuckDB RAG Engine** (`council/rag.py`) and Telemetry Logger (`council/telemetry.py`) run 100% locally using an embedded DuckDB database file (`ai_consilium.duckdb`). DuckDB automatically creates the file on first run. Database files (`*.duckdb`, `*.duckdb.wal`) are blocked by `.gitignore` to guarantee your research history and vector indices remain 100% private on your machine.
 
+---
 
+## 🏃 How to Run AI Consilium (Execution Commands)
 
-## 🏃 How to Run AI Consilium (3 Execution Modes)
-
-### Mode 1: Streamlit Interactive Web Application (Recommended)
-Launch the full interactive web dashboard featuring live provider progress bars, interactive consensus gauges, dynamic Mermaid.js rendering, and the audit telemetry console:
+### 1. Streamlit Interactive Web Application (Recommended)
+Launch the full interactive web dashboard featuring live provider progress bars, interactive consensus gauges, dynamic Mermaid.js rendering, user feedback buttons, and the audit telemetry console:
 
 ```bash
 # Sync dependencies
@@ -210,7 +277,7 @@ uv run streamlit run app.py
 
 ---
 
-### Mode 2: Command-Line CLI Interface
+### 2. Command-Line CLI Interface
 Execute consensus queries directly from your terminal with optional OpenRouter free tier routing, JSON output, or automated Obsidian vault export:
 
 ```bash
@@ -226,7 +293,25 @@ uv run python main.py --query "Compare PostgreSQL vs DuckDB" --json
 
 ---
 
-### Mode 3: Containerized Docker Compose Deployment
+### 3. Bulk Obsidian Vault Ingestion CLI (`ingest.py`)
+Bulk-scan and index an existing folder of Markdown notes into DuckDB RAG for "Warm Start" grounded search:
+
+```bash
+uv run python ingest.py --dir C:/ai-memory/ai-concilium
+```
+
+---
+
+### 4. RAG Retrieval Evaluation Benchmark (`evaluate_retrieval.py`)
+Run empirical retrieval quality benchmarks calculating Hit Rate @ K and Mean Reciprocal Rank (MRR @ K):
+
+```bash
+uv run python evaluate_retrieval.py
+```
+
+---
+
+### 5. Containerized Docker Compose Deployment
 Package and run the entire application inside a reproducible Docker container with persistent volume mounts for telemetry and Obsidian vault storage:
 
 ```bash
@@ -235,6 +320,40 @@ docker compose up --build
 ```
 Access the application dashboard at `http://localhost:8501`.
 
+---
+
+## 🧪 Test Suite & Quality Assurance
+
+AI Consilium features an extensive automated test suite covering unit, integration, security, stability, CLI, and end-to-end pipeline benchmarks.
+
+```bash
+# Run the complete test suite
+uv run pytest
+```
+
+### Test Suite Summary:
+```text
+collected 45 items
+
+tests/test_app.py .                                                      [  2%]
+tests/test_basic.py ..                                                   [  6%]
+tests/test_consensus.py ...                                              [ 13%]
+tests/test_docker.py ..                                                  [ 17%]
+tests/test_eval.py ..                                                    [ 22%]
+tests/test_exporter.py ..                                                [ 26%]
+tests/test_ingest.py ..                                                  [ 31%]
+tests/test_main.py ...                                                   [ 37%]
+tests/test_pipeline.py ..                                                [ 42%]
+tests/test_providers.py ......                                           [ 55%]
+tests/test_rag.py ....                                                   [ 64%]
+tests/test_schemas.py .......                                            [ 80%]
+tests/test_security.py ...                                               [ 86%]
+tests/test_stability.py ..                                               [ 91%]
+tests/test_synthesizer.py ..                                             [ 95%]
+tests/test_telemetry.py ..                                               [100%]
+
+============================= 45 passed in 33.16s =============================
+```
 
 ---
 
@@ -243,7 +362,7 @@ Access the application dashboard at `http://localhost:8501`.
 This project strictly adheres to **Spec-Driven Design (SDD)** principles:
 1. **High-Level Specs First:** Specs are defined, reviewed, and locked in before writing implementation code.
 2. **Auditable Requirements:** Every feature maps directly to a specification file in `_docs/`.
-3. **Automated Testing & DoD:** Definition of Done requires unit test pass rates and verification before landing features.
+3. **Automated Testing & DoD:** Definition of Done requires 100% unit test pass rates and empirical verification before landing features.
 
 ---
 
@@ -265,4 +384,3 @@ If you want to see **AI Consilium** in action and experience its practical value
 uv run python main.py --query "Compare embedded DuckDB (VSS + FTS) vs PostgreSQL (pgvector) for zero-dependency local desktop RAG search" --free-tier --export
 ```
 *(This asynchronously queries 5 free models concurrently, calculates the numerical Consensus Score, generates a Mermaid.js diagram, and exports a formatted note directly to your local vault folder!)*
-
