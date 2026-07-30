@@ -1,10 +1,10 @@
 """
-LLM-as-a-Judge Qualitative Synthesizer for AI Consilium
+LLM-as-a-Judge Qualitative Synthesizer Module for AI Consilium
 """
 
 import json
-import logging
 import re
+import logging
 from typing import List, Optional
 import litellm
 
@@ -17,6 +17,13 @@ from council.schemas import (
 )
 
 logger = logging.getLogger(__name__)
+
+JUDGE_FALLBACK_CHAIN = [
+    "gemini/gemini-2.5-flash",
+    "gpt-4o",
+    "claude-3-5-haiku-20241022",
+    "openrouter/google/gemma-4-31b-it:free",
+]
 
 
 class LLMJudgeSynthesizer:
@@ -60,10 +67,10 @@ class LLMJudgeSynthesizer:
         )
 
         user_content = (
-            f"User Query:\n{query_input.query}\n\n"
-            f"Numerical Consensus Score: {consensus_metrics.consensus_score}%\n"
-            f"Detected Outlier Models: {outliers_str}\n\n"
-            f"Model Responses:\n{responses_formatted}"
+            f"User Research Query: {query_input.query}\n\n"
+            f"Calculated Embedding Consensus Score: {consensus_metrics.consensus_score:.1f}%\n"
+            f"Flagged Statistical Outliers: {outliers_str}\n\n"
+            f"Model Responses to Evaluate:\n{responses_formatted}"
         )
 
         return [
@@ -72,23 +79,21 @@ class LLMJudgeSynthesizer:
         ]
 
     def _clean_json_response(self, text: str) -> dict:
-        """Extract and parse JSON content from raw LLM output markdown or code blocks."""
+        """Clean markdown wrapping and parse raw LLM JSON response."""
         cleaned = text.strip()
-        # Remove markdown code block fences if present
         if cleaned.startswith("```json"):
             cleaned = cleaned[7:]
-        elif cleaned.startswith("```"):
+        if cleaned.startswith("```"):
             cleaned = cleaned[3:]
         if cleaned.endswith("```"):
             cleaned = cleaned[:-3]
         cleaned = cleaned.strip()
 
-        # Try direct JSON parse
         try:
             return json.loads(cleaned)
         except Exception:
-            # Fallback regex search for JSON object inside braces
-            match = re.search(r"(\{.*\})", cleaned, re.DOTALL)
+            # Fallback non-greedy regex search for JSON object inside braces
+            match = re.search(r"(\{.*?\})", cleaned, re.DOTALL)
             if match:
                 return json.loads(match.group(1))
             raise ValueError(f"Could not parse valid JSON from synthesis response: {text[:100]}...")
@@ -102,59 +107,67 @@ class LLMJudgeSynthesizer:
     ) -> ConsiliumFinalArtifact:
         """
         Execute qualitative synthesis via lead LLM judge and return validated ConsiliumFinalArtifact.
+        Attempts models in JUDGE_FALLBACK_CHAIN sequentially if lead model fails.
         """
-        target_model = lead_model or self.default_lead_model
+        candidate_models = [lead_model] if lead_model else [self.default_lead_model] + [
+            m for m in JUDGE_FALLBACK_CHAIN if m != self.default_lead_model
+        ]
+
         messages = self._build_synthesis_prompt(query_input, responses, consensus_metrics)
+        last_error = None
 
-        try:
-            res = await litellm.acompletion(
-                model=target_model,
-                messages=messages,
-                response_format={"type": "json_object"},
-                timeout=self.timeout,
-            )
-
-            raw_text = res.choices[0].message.content or "{}"
-            parsed = self._clean_json_response(raw_text)
-
-            contradiction_objs = [
-                ContradictionItem(
-                    topic=str(c.get("topic", "General")),
-                    description=str(c.get("description", "")),
-                    conflicting_models=list(c.get("conflicting_models", [])),
+        for model in candidate_models:
+            try:
+                res = await litellm.acompletion(
+                    model=model,
+                    messages=messages,
+                    response_format={"type": "json_object"},
+                    timeout=self.timeout,
                 )
-                for c in parsed.get("contradictions", [])
-            ]
 
-            return ConsiliumFinalArtifact(
-                query=query_input.query,
-                consensus_score=consensus_metrics.consensus_score,
-                agreement_points=list(parsed.get("agreement_points", [])),
-                contradictions=contradiction_objs,
-                mermaid_code=str(parsed.get("mermaid_code", "")),
-                obsidian_title=str(parsed.get("obsidian_title", "consensus-research")),
-                tags=list(parsed.get("tags", ["consensus", "research"])),
-                responses=responses,
-            )
+                raw_text = res.choices[0].message.content or "{}"
+                parsed = self._clean_json_response(raw_text)
 
-        except Exception as e:
-            logger.error(f"Synthesizer LLM failed or returned invalid JSON ({e}). Falling back to heuristic synthesis.")
-            # Heuristic fallback if LLM synthesis fails
-            valid_responses = [r for r in responses if r.status == "success"]
-            fallback_agreements = [f"Synthesized answer across {len(valid_responses)} models."]
+                contradiction_objs = [
+                    ContradictionItem(
+                        topic=str(c.get("topic", "General")),
+                        description=str(c.get("description", "")),
+                        conflicting_models=list(c.get("conflicting_models", [])),
+                    )
+                    for c in parsed.get("contradictions", [])
+                ]
 
-            fallback_mermaid = (
-                "graph TD\n"
-                f"  Q[\"{query_input.query[:30]}...\"] --> C[\"Consensus: {consensus_metrics.consensus_score}%\"]\n"
-            )
+                return ConsiliumFinalArtifact(
+                    query=query_input.query,
+                    consensus_score=consensus_metrics.consensus_score,
+                    agreement_points=list(parsed.get("agreement_points", [])),
+                    contradictions=contradiction_objs,
+                    mermaid_code=str(parsed.get("mermaid_code", "")),
+                    obsidian_title=str(parsed.get("obsidian_title", "consensus-research")),
+                    tags=list(parsed.get("tags", ["consensus", "research"])),
+                    responses=responses,
+                )
+            except Exception as e:
+                logger.warning(f"Synthesis failed with judge model {model}: {e}. Trying fallback...")
+                last_error = e
 
-            return ConsiliumFinalArtifact(
-                query=query_input.query,
-                consensus_score=consensus_metrics.consensus_score,
-                agreement_points=fallback_agreements,
-                contradictions=[],
-                mermaid_code=fallback_mermaid,
-                obsidian_title="consensus-research-report",
-                tags=["consensus", "research"],
-                responses=responses,
-            )
+        # Heuristic fallback if all judge models fail
+        logger.error(f"All LLM judge models in chain failed ({last_error}). Using heuristic fallback.")
+        valid_responses = [r for r in responses if r.status == "success"]
+        fallback_agreements = [f"Synthesized answer across {len(valid_responses)} models."]
+
+        fallback_mermaid = (
+            "graph TD\n"
+            f"  Q[\"{query_input.query[:30]}...\"] --> C[\"Consensus: {consensus_metrics.consensus_score}%\"]\n"
+        )
+
+        return ConsiliumFinalArtifact(
+            query=query_input.query,
+            consensus_score=consensus_metrics.consensus_score,
+            agreement_points=fallback_agreements,
+            contradictions=[],
+            mermaid_code=fallback_mermaid,
+            obsidian_title="consensus-research-report",
+            tags=["consensus", "research"],
+            responses=responses,
+        )

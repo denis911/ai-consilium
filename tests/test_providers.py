@@ -114,9 +114,9 @@ def test_get_effective_models_selection():
     with patch.dict(os.environ, {"OPENROUTER_API_KEY": "sk-or-test"}, clear=True):
         assert engine.get_effective_models() == OPENROUTER_FREE_MODELS
 
-    # Primary key present overrides default
+    # Primary key present returns filtered models matching available keys
     with patch.dict(os.environ, {"OPENROUTER_API_KEY": "sk-or-test", "OPENAI_API_KEY": "sk-proj-test"}, clear=True):
-        assert engine.get_effective_models() == DEFAULT_MODELS
+        assert engine.get_effective_models() == ["gpt-4o"]
 
 
 @pytest.mark.asyncio

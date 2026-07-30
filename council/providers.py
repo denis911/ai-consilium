@@ -63,7 +63,6 @@ class LLMProviderEngine:
         if use_free_tier:
             return OPENROUTER_FREE_MODELS
 
-        # Auto-detect: if OPENROUTER_API_KEY is present and no primary keys are configured
         has_openrouter = bool(os.environ.get("OPENROUTER_API_KEY"))
         has_primary_keys = any(bool(os.environ.get(key)) for key in PRIMARY_PROVIDER_KEYS)
 
@@ -71,7 +70,21 @@ class LLMProviderEngine:
             logger.info("Only OPENROUTER_API_KEY detected. Auto-routing to OpenRouter free model tier.")
             return OPENROUTER_FREE_MODELS
 
-        return DEFAULT_MODELS
+        # Filter DEFAULT_MODELS by available API keys
+        model_key_mapping = {
+            "gpt-4o": "OPENAI_API_KEY",
+            "claude-3-5-haiku-20241022": "ANTHROPIC_API_KEY",
+            "gemini/gemini-2.5-flash": "GEMINI_API_KEY",
+            "perplexity/sonar": "PERPLEXITY_API_KEY",
+            "xai/grok-2": "XAI_API_KEY",
+        }
+
+        available_default_models = [
+            m for m in DEFAULT_MODELS
+            if os.environ.get(model_key_mapping.get(m, "")) or (has_openrouter and m.startswith("openrouter/"))
+        ]
+
+        return available_default_models if available_default_models else DEFAULT_MODELS
 
     async def _query_single_provider(
         self,

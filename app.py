@@ -56,9 +56,30 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+import nest_asyncio
+nest_asyncio.apply()
+
+
+@st.cache_resource
+def get_telemetry_logger():
+    """Cached DuckDB Telemetry Logger instance to prevent connection leaks across re-runs."""
+    return DuckDBTelemetryLogger()
+
+
+@st.cache_resource
+def get_consensus_engine():
+    """Cached Consensus Engine instance to prevent duplicate embedding model loads in memory."""
+    return ConsensusEngine()
+
+
 def run_async(coro):
-    """Utility helper to run async coroutines in Streamlit."""
-    return asyncio.run(coro)
+    """Utility helper to run async coroutines safely in Streamlit."""
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    return loop.run_until_complete(coro)
 
 
 def main():
@@ -69,8 +90,8 @@ def main():
         unsafe_allow_html=True,
     )
 
-    # Initialize Telemetry Logger
-    telemetry = DuckDBTelemetryLogger()
+    # Initialize Telemetry Logger (Cached Singleton)
+    telemetry = get_telemetry_logger()
 
     # Sidebar Configuration
     st.sidebar.title("⚙️ Engine Settings")
@@ -147,7 +168,7 @@ def main():
 
                 # Step 3: Mathematical Embedding Consensus Scoring
                 status.update(label="3/4 📐 Calculating embedding similarity matrix & outlier detection...", state="running")
-                consensus_engine = ConsensusEngine()
+                consensus_engine = get_consensus_engine()
                 consensus_metrics = consensus_engine.compute_consensus(responses)
 
                 # Step 4: Qualitative Synthesis via LLM Judge
@@ -250,8 +271,6 @@ def main():
             st.dataframe(history, use_container_width=True)
         else:
             st.info("No query logs recorded in DuckDB yet. Run a query in Tab 1 to generate telemetry.")
-
-    telemetry.close()
 
 
 if __name__ == "__main__":
