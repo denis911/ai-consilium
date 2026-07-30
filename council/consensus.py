@@ -37,14 +37,17 @@ class ConsensusEngine:
                 consensus_score=0.0,
                 outlier_models=[],
                 pairwise_similarity={},
+                insufficient_responses=True,
             )
 
         if len(valid_responses) == 1:
             model_name = valid_responses[0].model_name
+            logger.warning(f"Single model response ({model_name}). Insufficient models for inter-model validation.")
             return ConsensusMetrics(
-                consensus_score=100.0,
+                consensus_score=0.0,
                 outlier_models=[],
                 pairwise_similarity={model_name: {model_name: 1.0}},
+                insufficient_responses=True,
             )
 
         # Generate embeddings for valid responses
@@ -79,26 +82,31 @@ class ConsensusEngine:
 
         consensus_score = round(avg_similarity * 100.0, 2)
 
-        # Detect outlier models using relative ensemble distance
+        # Detect outlier models using Z-score and relative distance
         mean_similarities = []
         for i in range(n):
             other_sims = [similarity_matrix[i, j] for j in range(n) if i != j]
             mean_similarities.append(float(np.mean(other_sims)) if other_sims else 1.0)
 
-        max_mean_sim = max(mean_similarities)
+        overall_mean_sim = float(np.mean(mean_similarities))
+        overall_std_sim = float(np.std(mean_similarities))
         median_mean_sim = float(np.median(mean_similarities))
 
         outlier_models: List[str] = []
         for i in range(n):
             m_sim = mean_similarities[i]
-            # A model is an outlier if its average similarity to peers is significantly lower
-            # than the ensemble median or configured threshold and max peer similarity
-            is_relative_outlier = (m_sim < (median_mean_sim - 0.15)) or (m_sim < outlier_threshold and (max_mean_sim - m_sim) >= 0.15)
-            if is_relative_outlier:
+            if n >= 3 and overall_std_sim > 0.01:
+                z_score = (m_sim - overall_mean_sim) / overall_std_sim
+                is_outlier = z_score < -1.5 or m_sim < (outlier_threshold - 0.1)
+            else:
+                is_outlier = (m_sim < (median_mean_sim - 0.15)) or (m_sim < outlier_threshold and (max(mean_similarities) - m_sim) >= 0.15)
+
+            if is_outlier:
                 outlier_models.append(model_names[i])
 
         return ConsensusMetrics(
             consensus_score=consensus_score,
             outlier_models=outlier_models,
             pairwise_similarity=pairwise_dict,
+            insufficient_responses=False,
         )

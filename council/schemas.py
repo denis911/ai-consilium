@@ -45,6 +45,7 @@ class ConsensusMetrics(BaseModel):
     pairwise_similarity: Dict[str, Dict[str, float]] = Field(
         default_factory=dict, description="Pairwise similarity matrix between models"
     )
+    insufficient_responses: bool = Field(default=False, description="Flag indicating if fewer than 2 valid model responses were available")
 
 
 class ConsiliumFinalArtifact(BaseModel):

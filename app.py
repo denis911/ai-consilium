@@ -191,12 +191,16 @@ def main():
             st.markdown("---")
             st.subheader("📊 Consensus Executive Brief")
 
+            valid_count = len([r for r in artifact.responses if r.status == "success"])
+            if valid_count < 2:
+                st.warning("⚠️ **Warning: Insufficient Model Responses!** Only 1 model returned a response. Zero inter-model consensus validation is possible.")
+
             col_metric, col_outliers, col_vault = st.columns([2, 2, 2])
             with col_metric:
                 st.metric(
                     label="Mathematical Consensus Score",
                     value=f"{artifact.consensus_score:.1f}%",
-                    delta="High Agreement" if artifact.consensus_score >= 75.0 else "Contradictions Detected",
+                    delta="High Agreement" if (artifact.consensus_score >= 75.0 and valid_count >= 2) else ("Insufficient Data" if valid_count < 2 else "Contradictions Detected"),
                 )
 
             with col_outliers:

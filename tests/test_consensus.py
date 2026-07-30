@@ -46,5 +46,6 @@ def test_consensus_empty_and_single_responses():
     # Single response
     single = [ModelResponsePayload(model_name="gpt-4o", response_text="Single answer.")]
     metrics_single = engine.compute_consensus(single)
-    assert metrics_single.consensus_score == 100.0
+    assert metrics_single.consensus_score == 0.0
+    assert metrics_single.insufficient_responses is True
     assert metrics_single.outlier_models == []
