@@ -177,7 +177,8 @@ def main():
                 final_artifact = run_async(synthesizer.synthesize(query_input, responses, consensus_metrics))
 
                 # Log Telemetry to DuckDB
-                telemetry.log_query_run(final_artifact)
+                run_id = telemetry.log_query_run(final_artifact)
+                st.session_state["latest_run_id"] = run_id
 
                 status.update(label="✅ Consilium Consensus Complete!", state="complete", expanded=False)
 
@@ -218,6 +219,20 @@ def main():
                     saved_path = exporter.export_artifact(artifact, vault_path=vault_path)
                     st.success(f"✅ Note exported to: `{saved_path}`")
 
+            # Feedback Rating Buttons
+            st.markdown("**Rate this consensus brief:**")
+            fb_col1, fb_col2, _ = st.columns([1, 1, 4])
+            with fb_col1:
+                if st.button("👍 Accurate", key="btn_pos", use_container_width=True):
+                    if "latest_run_id" in st.session_state:
+                        telemetry.update_user_feedback(st.session_state["latest_run_id"], rating=1)
+                        st.success("Feedback recorded! 👍")
+            with fb_col2:
+                if st.button("👎 Contradictory", key="btn_neg", use_container_width=True):
+                    if "latest_run_id" in st.session_state:
+                        telemetry.update_user_feedback(st.session_state["latest_run_id"], rating=-1)
+                        st.warning("Feedback recorded! 👎")
+
             col_left, col_right = st.columns([1, 1])
 
             with col_left:
@@ -255,17 +270,19 @@ def main():
         st.subheader("📊 Execution Audit Logs & Analytics")
 
         summary = telemetry.get_telemetry_summary()
-        col1, col2, col3, col4, col5 = st.columns(5)
+        col1, col2, col3, col4, col5, col6 = st.columns(6)
         with col1:
             st.metric("Total Queries", summary["total_queries"])
         with col2:
             st.metric("Avg Consensus Score", f"{summary['avg_consensus_score']:.1f}%")
         with col3:
-            st.metric("Total Tokens Consumed", summary["total_tokens"])
+            st.metric("Total Tokens", summary["total_tokens"])
         with col4:
-            st.metric("Total Estimated Cost", f"${summary['total_cost_usd']:.4f}")
+            st.metric("Est. USD Cost", f"${summary['total_cost_usd']:.4f}")
         with col5:
             st.metric("Avg Latency", f"{summary['avg_latency_ms']:.0f} ms")
+        with col6:
+            st.metric("User Approval Rate", f"{summary.get('satisfaction_rate_percentage', 100.0):.1f}%")
 
         st.markdown("---")
         st.markdown("### 📜 Query Execution History")

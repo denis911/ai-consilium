@@ -37,9 +37,20 @@ class DuckDBTelemetryLogger:
                 total_cost_usd FLOAT,
                 avg_latency_ms FLOAT,
                 model_latencies VARCHAR,
-                num_contradictions INTEGER
+                num_contradictions INTEGER,
+                user_rating INTEGER DEFAULT 0,
+                user_feedback_comment VARCHAR DEFAULT ''
             );
         """)
+        # Safe migration if table exists without new columns
+        try:
+            self.conn.execute("ALTER TABLE query_logs ADD COLUMN user_rating INTEGER DEFAULT 0;")
+        except Exception:
+            pass
+        try:
+            self.conn.execute("ALTER TABLE query_logs ADD COLUMN user_feedback_comment VARCHAR DEFAULT '';")
+        except Exception:
+            pass
 
     def log_query_run(self, artifact: ConsiliumFinalArtifact) -> str:
         """
@@ -93,12 +104,25 @@ class DuckDBTelemetryLogger:
         logger.info(f"Logged query execution run {run_id} to DuckDB query_logs.")
         return run_id
 
+    def update_user_feedback(self, run_id: str, rating: int, comment: str = "") -> None:
+        """Update user rating (+1 / -1) and optional comment for a run."""
+        self.conn.execute(
+            """
+            UPDATE query_logs
+            SET user_rating = ?, user_feedback_comment = ?
+            WHERE run_id = ?
+            """,
+            (rating, comment, run_id),
+        )
+        logger.info(f"Updated user feedback for run {run_id}: rating={rating}")
+
     def get_audit_history(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Retrieve historical query execution logs ordered by timestamp descending."""
         res = self.conn.execute(
             """
             SELECT run_id, timestamp, query, consensus_score, num_models,
-                   total_tokens, total_cost_usd, avg_latency_ms, model_latencies, num_contradictions
+                   total_tokens, total_cost_usd, avg_latency_ms, model_latencies, num_contradictions,
+                   user_rating, user_feedback_comment
             FROM query_logs
             ORDER BY timestamp DESC
             LIMIT ?
@@ -107,10 +131,10 @@ class DuckDBTelemetryLogger:
         ).fetchall()
 
         history = []
-        for run_id, ts, q, score, num_m, tokens, cost, latency, latencies_json, contradictions in res:
+        for run_id, ts, q, score, num_m, tokens, cost, latency, latencies_json, contradictions, rating, comment in res:
             history.append({
                 "run_id": run_id,
-                "timestamp": ts,
+                "timestamp": str(ts),
                 "query": q,
                 "consensus_score": float(score),
                 "num_models": num_m,
@@ -119,23 +143,28 @@ class DuckDBTelemetryLogger:
                 "avg_latency_ms": float(latency),
                 "model_latencies": json.loads(latencies_json) if latencies_json else {},
                 "num_contradictions": contradictions,
+                "user_rating": rating or 0,
+                "user_feedback_comment": comment or "",
             })
         return history
 
     def get_telemetry_summary(self) -> Dict[str, Any]:
-        """Aggregate total queries, average consensus score, tokens, cost, and latency."""
+        """Aggregate total queries, average consensus score, tokens, cost, latency, and satisfaction rate."""
         res = self.conn.execute(
             """
             SELECT COUNT(*),
                    COALESCE(AVG(consensus_score), 0.0),
                    COALESCE(SUM(total_tokens), 0),
                    COALESCE(SUM(total_cost_usd), 0.0),
-                   COALESCE(AVG(avg_latency_ms), 0.0)
+                   COALESCE(AVG(avg_latency_ms), 0.0),
+                   COALESCE(SUM(CASE WHEN user_rating > 0 THEN 1 ELSE 0 END), 0),
+                   COALESCE(SUM(CASE WHEN user_rating != 0 THEN 1 ELSE 0 END), 0)
             FROM query_logs
             """
         ).fetchone()
 
-        total_queries, avg_score, total_tokens, total_cost, avg_latency = res
+        total_queries, avg_score, total_tokens, total_cost, avg_latency, pos_ratings, total_rated = res
+        satisfaction_rate = round((pos_ratings / total_rated) * 100.0, 1) if total_rated > 0 else 100.0
 
         return {
             "total_queries": total_queries,
@@ -143,6 +172,8 @@ class DuckDBTelemetryLogger:
             "total_tokens": int(total_tokens),
             "total_cost_usd": round(float(total_cost), 6),
             "avg_latency_ms": round(float(avg_latency), 2),
+            "satisfaction_rate_percentage": satisfaction_rate,
+            "total_rated_queries": total_rated,
         }
 
     def close(self) -> None:

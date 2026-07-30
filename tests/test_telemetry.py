@@ -70,8 +70,11 @@ def test_telemetry_summary_aggregations(sample_artifact):
     logger = DuckDBTelemetryLogger(db_path=":memory:")
 
     # Log 2 runs
-    logger.log_query_run(sample_artifact)
-    logger.log_query_run(sample_artifact)
+    run_id1 = logger.log_query_run(sample_artifact)
+    run_id2 = logger.log_query_run(sample_artifact)
+
+    logger.update_user_feedback(run_id1, rating=1, comment="Great summary!")
+    logger.update_user_feedback(run_id2, rating=-1, comment="Low quality")
 
     summary = logger.get_telemetry_summary()
     assert summary["total_queries"] == 2
@@ -79,5 +82,9 @@ def test_telemetry_summary_aggregations(sample_artifact):
     assert summary["total_tokens"] == 540
     assert summary["total_cost_usd"] == pytest.approx(0.008, rel=1e-4)
     assert summary["avg_latency_ms"] == 1000.0
+    assert summary["satisfaction_rate_percentage"] == 50.0
+
+    history = logger.get_audit_history(limit=10)
+    assert history[0]["user_rating"] in (1, -1)
 
     logger.close()
