@@ -15,6 +15,8 @@ class ConsiliumQueryInput(BaseModel):
     @field_validator("query")
     @classmethod
     def validate_query_not_whitespace(cls, v: str) -> str:
+        if not isinstance(v, str):
+            raise ValueError("Query must be a string")
         if not v.strip():
             raise ValueError("Query string cannot be empty or whitespace only")
         return v.strip()

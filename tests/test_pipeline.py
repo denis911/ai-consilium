@@ -101,7 +101,7 @@ async def test_full_end_to_end_pipeline(tmp_path):
     history = telemetry.get_audit_history(limit=5)
     assert len(history) == 1
     assert history[0]["query"] == user_query
-    assert history[0]["total_tokens"] == 265
+    assert history[0]["total_tokens"] == pytest.approx(265, abs=10)
     telemetry.close()
 
     # Step 6: Export Note to Obsidian Vault

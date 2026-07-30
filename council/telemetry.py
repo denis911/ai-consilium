@@ -27,7 +27,7 @@ class DuckDBTelemetryLogger:
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS query_logs (
                 run_id VARCHAR PRIMARY KEY,
-                timestamp VARCHAR,
+                timestamp TIMESTAMP,
                 query VARCHAR,
                 consensus_score FLOAT,
                 num_models INTEGER,
