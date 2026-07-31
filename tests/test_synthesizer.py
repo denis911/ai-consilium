@@ -92,3 +92,24 @@ def test_clean_json_response_nested_brackets():
     assert parsed["agreement_points"] == ["point1"]
     assert len(parsed["contradictions"]) == 1
     assert parsed["contradictions"][0]["topic"] == "T1"
+
+
+def test_clean_json_response_mermaid_braces():
+    synthesizer = LLMJudgeSynthesizer()
+    raw_llm_text = (
+        "Output:\n"
+        '{"agreement_points": ["point1"], '
+        '"mermaid_code": "graph TD\\n  subgraph S1 [Section]\\n    A{Topic} --> B[Consensus]\\n  end", '
+        '"obsidian_title": "title", "tags": ["tag"]}\n'
+        "Enjoy!"
+    )
+    parsed = synthesizer._clean_json_response(raw_llm_text)
+    assert parsed["agreement_points"] == ["point1"]
+    assert "subgraph S1" in parsed["mermaid_code"]
+
+
+def test_clean_json_response_stray_leading_braces():
+    synthesizer = LLMJudgeSynthesizer()
+    raw_llm_text = "} {\"agreement_points\": [\"point1\"], \"mermaid_code\": \"\", \"obsidian_title\": \"t\", \"tags\": []}"
+    parsed = synthesizer._clean_json_response(raw_llm_text)
+    assert parsed["agreement_points"] == ["point1"]

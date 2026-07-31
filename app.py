@@ -143,6 +143,9 @@ def main():
         if run_button and user_query.strip():
             with st.status("🏛️ Executing Consilium Multi-Model Consensus Engine...", expanded=True) as status:
 
+                # Resolve cached singletons early
+                consensus_engine = get_consensus_engine()
+
                 # Step 1: RAG Context Preparation
                 status.update(label="1/4 📚 Ingesting context & retrieving RAG snippets...", state="running")
                 context_chunks = []
@@ -168,7 +171,6 @@ def main():
 
                 # Step 3: Mathematical Embedding Consensus Scoring
                 status.update(label="3/4 📐 Calculating embedding similarity matrix & outlier detection...", state="running")
-                consensus_engine = get_consensus_engine()
                 consensus_metrics = consensus_engine.compute_consensus(responses)
 
                 # Step 4: Qualitative Synthesis via LLM Judge

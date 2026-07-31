@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 JUDGE_FALLBACK_CHAIN = [
     "gemini/gemini-2.5-flash",
     "gpt-4o",
-    "claude-3-5-haiku-20241022",
+    "anthropic/claude-3-5-haiku-20241022",
     "openrouter/google/gemma-4-31b-it:free",
 ]
 
@@ -64,13 +64,36 @@ class LLMJudgeSynthesizer:
             '  "obsidian_title": "2026-07-25-topic-name",\n'
             '  "tags": ["tag1", "tag2"]\n'
             "}"
+            "You are an executive AI Consilium Synthesizer. Your job is to analyze individual LLM responses to a query "
+            "and synthesize an executive brief. Output strictly valid JSON without any markdown formatting."
         )
 
+        models_data = []
+        for r in responses:
+            models_data.append({
+                "model_name": r.model_name,
+                "status": r.status,
+                "response_text": r.response_text,
+                "latency_ms": r.latency_ms,
+            })
+
+        user_payload = {
+            "query": query_input.query,
+            "consensus_score": consensus_metrics.consensus_score,
+            "outlier_models": consensus_metrics.outlier_models,
+            "pairwise_similarity": consensus_metrics.pairwise_similarity,
+            "model_responses": models_data,
+        }
+
         user_content = (
-            f"User Research Query: {query_input.query}\n\n"
-            f"Calculated Embedding Consensus Score: {consensus_metrics.consensus_score:.1f}%\n"
-            f"Flagged Statistical Outliers: {outliers_str}\n\n"
-            f"Model Responses to Evaluate:\n{responses_formatted}"
+            f"Analyze the following multi-model responses and consensus metrics:\n\n"
+            f"```json\n{json.dumps(user_payload, indent=2)}\n```\n\n"
+            "Return a single JSON object with the following exact keys:\n"
+            "- \"agreement_points\": list of strings summarizing key points of unanimous consensus\n"
+            "- \"contradictions\": list of objects with {\"topic\": string, \"description\": string, \"conflicting_models\": list of strings}\n"
+            "- \"mermaid_code\": valid Mermaid.js diagram code visualizing the workflow or trade-offs\n"
+            "- \"obsidian_title\": recommended note title string (kebab-case)\n"
+            "- \"tags\": list of 3-5 relevance tags\n"
         )
 
         return [
@@ -79,22 +102,38 @@ class LLMJudgeSynthesizer:
         ]
 
     def _extract_outermost_json(self, text: str) -> dict:
-        """Extract and parse the outermost JSON object from text using brace depth counting."""
+        """Extract and parse the outermost JSON object from text, ignoring braces in string literals."""
         depth = 0
         start = None
+        in_string = False
+        escaped = False
+
         for i, ch in enumerate(text):
+            if ch == '"' and not escaped:
+                in_string = not in_string
+                continue
+
+            if in_string:
+                if ch == '\\':
+                    escaped = not escaped
+                else:
+                    escaped = False
+                continue
+
+            # Outside string literals, track brace depth
             if ch == '{':
                 if depth == 0:
                     start = i
                 depth += 1
             elif ch == '}':
-                depth -= 1
-                if depth == 0 and start is not None:
-                    json_candidate = text[start:i + 1]
-                    try:
-                        return json.loads(json_candidate)
-                    except Exception:
-                        pass
+                if depth > 0:
+                    depth -= 1
+                    if depth == 0 and start is not None:
+                        json_candidate = text[start:i + 1]
+                        try:
+                            return json.loads(json_candidate)
+                        except Exception:
+                            pass
         raise ValueError(f"Could not parse valid JSON from synthesis response: {text[:100]}...")
 
     def _clean_json_response(self, text: str) -> dict:
