@@ -19,10 +19,11 @@ class DuckDBRAGEngine:
         self,
         db_path: str = ":memory:",
         embedding_model_name: str = "all-MiniLM-L6-v2",
+        shared_model: Optional[Any] = None,
     ):
         self.db_path = db_path
         self.embedding_model_name = embedding_model_name
-        self.model = SentenceTransformer(embedding_model_name)
+        self.model = shared_model or SentenceTransformer(embedding_model_name)
         self.conn = duckdb.connect(db_path)
         self._init_database()
 

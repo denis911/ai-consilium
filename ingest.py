@@ -10,13 +10,14 @@ import logging
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
+import duckdb
 from council.rag import DuckDBRAGEngine
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("ingest")
 
 
-def parse_markdown_file(file_path: Path) -> Optional[Dict[str, Any]]:
+def parse_markdown_file(file_path: Path, target_dir: Optional[Path] = None) -> Optional[Dict[str, Any]]:
     """Parse title, YAML tags, and content from a single Markdown file."""
     try:
         raw_text = file_path.read_text(encoding="utf-8").strip()
@@ -48,8 +49,10 @@ def parse_markdown_file(file_path: Path) -> Optional[Dict[str, Any]]:
             tags_str = tags_match.group(1)
             tags = [t.strip().strip('"').strip("'") for t in tags_str.split(",") if t.strip()]
 
+    doc_id = str(file_path.relative_to(target_dir)) if target_dir and file_path.is_relative_to(target_dir) else str(file_path.name)
+
     return {
-        "id": str(file_path.name),
+        "id": doc_id,
         "title": title,
         "content": content,
         "tags": tags,
@@ -75,7 +78,7 @@ def scan_and_ingest_directory(
     logger.info(f"Found {len(md_files)} markdown files in {target_dir}. Parsing documents...")
     documents = []
     for md_file in md_files:
-        parsed = parse_markdown_file(md_file)
+        parsed = parse_markdown_file(md_file, target_dir=target_dir)
         if parsed and parsed["content"].strip():
             documents.append(parsed)
 
@@ -83,7 +86,12 @@ def scan_and_ingest_directory(
         logger.info("No non-empty markdown documents parsed.")
         return 0
 
-    rag_engine = DuckDBRAGEngine(db_path=db_path)
+    try:
+        rag_engine = DuckDBRAGEngine(db_path=db_path)
+    except duckdb.IOException as e:
+        logger.error(f"❌ Connection Lock Failed: Could not open database at '{db_path}'. Is Streamlit app running? Error: {e}")
+        return 0
+
     count = rag_engine.ingest_documents(documents)
     rag_engine.close()
 

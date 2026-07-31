@@ -42,7 +42,8 @@ def test_exporter_validates_mermaid_syntax():
 
 
 def test_dockerignore_exists_and_contains_secrets():
-    dockerignore_path = Path(".dockerignore")
+    root_dir = Path(__file__).parent.parent
+    dockerignore_path = root_dir / ".dockerignore"
     assert dockerignore_path.exists()
     content = dockerignore_path.read_text(encoding="utf-8")
     assert ".env" in content

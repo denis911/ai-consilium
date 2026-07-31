@@ -78,3 +78,17 @@ async def test_synthesizer_fallback_on_llm_error(mock_synthesis_data):
         assert artifact.consensus_score == 88.5
         assert len(artifact.agreement_points) >= 1
         assert "graph TD" in artifact.mermaid_code
+
+
+def test_clean_json_response_nested_brackets():
+    synthesizer = LLMJudgeSynthesizer()
+    raw_llm_text = (
+        "Here is the result:\n"
+        '{"agreement_points": ["point1"], "contradictions": [{"topic": "T1", "description": "D1", "conflicting_models": ["m1"]}], '
+        '"mermaid_code": "graph TD", "obsidian_title": "title", "tags": ["tag1"]}\n'
+        "Hope this helps!"
+    )
+    parsed = synthesizer._clean_json_response(raw_llm_text)
+    assert parsed["agreement_points"] == ["point1"]
+    assert len(parsed["contradictions"]) == 1
+    assert parsed["contradictions"][0]["topic"] == "T1"

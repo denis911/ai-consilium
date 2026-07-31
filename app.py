@@ -147,7 +147,7 @@ def main():
                 status.update(label="1/4 📚 Ingesting context & retrieving RAG snippets...", state="running")
                 context_chunks = []
                 if rag_context_input.strip():
-                    rag_engine = DuckDBRAGEngine(db_path=":memory:")
+                    rag_engine = DuckDBRAGEngine(db_path=":memory:", shared_model=consensus_engine.model)
                     rag_engine.ingest_documents([
                         {"id": "doc1", "title": "Reference Context", "content": rag_context_input.strip()}
                     ])

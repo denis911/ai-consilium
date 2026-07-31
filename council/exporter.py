@@ -129,7 +129,7 @@ class ObsidianExporter:
         target_file = (target_dir / filename).resolve()
 
         # Path traversal security check
-        if not str(target_file).startswith(str(target_dir)):
+        if not target_file.is_relative_to(target_dir.resolve()):
             raise ValueError(f"Unsafe export path resolved outside vault: {target_file}")
 
         content = self.format_markdown(artifact)

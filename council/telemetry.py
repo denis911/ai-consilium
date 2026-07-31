@@ -43,14 +43,13 @@ class DuckDBTelemetryLogger:
             );
         """)
         # Safe migration if table exists without new columns
-        try:
+        existing_cols = {
+            row[1] for row in self.conn.execute("PRAGMA table_info('query_logs');").fetchall()
+        }
+        if "user_rating" not in existing_cols:
             self.conn.execute("ALTER TABLE query_logs ADD COLUMN user_rating INTEGER DEFAULT 0;")
-        except Exception:
-            pass
-        try:
+        if "user_feedback_comment" not in existing_cols:
             self.conn.execute("ALTER TABLE query_logs ADD COLUMN user_feedback_comment VARCHAR DEFAULT '';")
-        except Exception:
-            pass
 
     def log_query_run(self, artifact: ConsiliumFinalArtifact) -> str:
         """

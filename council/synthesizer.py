@@ -78,6 +78,25 @@ class LLMJudgeSynthesizer:
             {"role": "user", "content": user_content},
         ]
 
+    def _extract_outermost_json(self, text: str) -> dict:
+        """Extract and parse the outermost JSON object from text using brace depth counting."""
+        depth = 0
+        start = None
+        for i, ch in enumerate(text):
+            if ch == '{':
+                if depth == 0:
+                    start = i
+                depth += 1
+            elif ch == '}':
+                depth -= 1
+                if depth == 0 and start is not None:
+                    json_candidate = text[start:i + 1]
+                    try:
+                        return json.loads(json_candidate)
+                    except Exception:
+                        pass
+        raise ValueError(f"Could not parse valid JSON from synthesis response: {text[:100]}...")
+
     def _clean_json_response(self, text: str) -> dict:
         """Clean markdown wrapping and parse raw LLM JSON response."""
         cleaned = text.strip()
@@ -92,11 +111,7 @@ class LLMJudgeSynthesizer:
         try:
             return json.loads(cleaned)
         except Exception:
-            # Fallback non-greedy regex search for JSON object inside braces
-            match = re.search(r"(\{.*?\})", cleaned, re.DOTALL)
-            if match:
-                return json.loads(match.group(1))
-            raise ValueError(f"Could not parse valid JSON from synthesis response: {text[:100]}...")
+            return self._extract_outermost_json(cleaned)
 
     async def synthesize(
         self,
