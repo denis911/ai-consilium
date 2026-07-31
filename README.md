@@ -387,16 +387,31 @@ tests/test_telemetry.py ..                                               [100%]
 ============================= 48 passed in 32.29s =============================
 ```
 
-### 🛡️ Dual-Review & QA Verification Pipeline:
-Every feature and bug fix in AI Consilium passes through a rigorous **5-Step Dual-Review Pipeline**:
+### 🛡️ Multi-Agent Tri-Review & Quality Assurance Pipeline
+
+Every feature and bug fix in AI Consilium passes through a rigorous **5-Step Tri-Review Pipeline** involving three independent AI reviewer personas and automated test validation:
 
 ```
  1. Coding & Implementation    --->  Primary coding AI (Gemini 3.6 Flash / Antigravity) implements feature requests based on groomed issues.
  2. Automated Test Battery     --->  Full test suite (`uv run pytest`) is executed to ensure zero regressions before committing to `main`.
- 3. Claude Code Review         --->  Independent code review conducted by Claude Staff SDE (logged in `review/YYYY-MM-DD-code-review-Claude.md`).
- 4. Jules Integrity Review     --->  Secondary review triggered via GitHub issue labeled `[jules]`, evaluated by Google Jules (logged in `review/YYYY-MM-DD-code-review-jules.md`).
- 5. Grooming & Verification    --->  Review findings are evaluated, groomed into GitHub issues, resolved in code, and verified via automated test battery and manual UI testing.
+ 3. Tri-Review Audit Phase     --->  Code is audited concurrently by 3 specialized reviewer personas (Claude 3.5 Sonnet, Google Jules, OpenAI Codex).
+ 4. Majority Consensus Groom   --->  "Two-Out-Of-Three" Majority Rule applied: issues flagged by >=2 reviewers are groomed into High-Priority GitHub Issues.
+ 5. Verification & Merge       --->  Review findings resolved in code, verified via automated test battery + manual UI testing, and merged to `main`.
 ```
+
+#### 🎭 Specialized Reviewer Personas & Noise Reduction Matrix
+
+Rather than having reviewers search for generic bugs redundantly, each reviewer operates under a distinct domain rubric to maximize depth and eliminate noise:
+
+| Reviewer Agent | Instruction Spec File | Target Log Location | Specialized Rubric & Focus |
+| :--- | :--- | :--- | :--- |
+| **Claude 3.5 Sonnet** | [`review/claude-review.md`](file:///c:/tmp/ai-consilium/review/claude-review.md) | `review/YYYY-MM-DD-code-review-Claude-N.md` | **Structural Architecture & Test Rigor:** Clean separation of concerns, modular design, documentation completeness, docstrings, and test assertion depth. |
+| **Google Jules** | [`review/jules-review.md`](file:///c:/tmp/ai-consilium/review/jules-review.md) | `review/YYYY-MM-DD-code-review-jules-N.md` | **Framework & Concurrency Optimization:** Idiomatic Python 3.11+ patterns, DuckDB/LiteLLM alignment, async lock safety, and resource lifecycle. |
+| **OpenAI Codex** | [`review/codex-review.md`](file:///c:/tmp/ai-consilium/review/codex-review.md) | `review/YYYY-MM-DD-code-review-Codex-N.md` | **Security & Algorithmic Performance:** Security vulnerability boundaries (path traversal, prompt injection, SQL injection), input sanitization, edge cases, and time/space complexity. |
+
+#### 🗳️ "Two-Out-Of-Three" Majority Consensus Rule
+- **High-Priority Critical Items:** Any logic, security, performance, or structural flaw flagged by **at least 2 out of 3 reviewers** is groomed into a high-priority GitHub issue for immediate resolution.
+- **Lower-Priority Quality Refinements:** Single-reviewer nitpicks are groomed as lower-priority backlog refinements.
 
 ---
 
