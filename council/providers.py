@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 # Standard frontier model identifiers for LiteLLM
 DEFAULT_MODELS: List[str] = [
-    "gpt-4o",
+    "o3-mini",
     "anthropic/claude-3-5-sonnet-20241022",
     "gemini/gemini-2.5-flash",
     "perplexity/sonar",
@@ -72,7 +72,7 @@ class LLMProviderEngine:
 
         # Filter DEFAULT_MODELS by available API keys
         model_key_mapping = {
-            "gpt-4o": "OPENAI_API_KEY",
+            "o3-mini": "OPENAI_API_KEY",
             "anthropic/claude-3-5-sonnet-20241022": "ANTHROPIC_API_KEY",
             "gemini/gemini-2.5-flash": "GEMINI_API_KEY",
             "perplexity/sonar": "PERPLEXITY_API_KEY",

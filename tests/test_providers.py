@@ -116,7 +116,7 @@ def test_get_effective_models_selection():
 
     # Primary key present returns filtered models matching available keys
     with patch.dict(os.environ, {"OPENROUTER_API_KEY": "sk-or-test", "OPENAI_API_KEY": "sk-proj-test"}, clear=True):
-        assert "gpt-4o" in engine.get_effective_models()
+        assert "o3-mini" in engine.get_effective_models()
 
 
 @pytest.mark.asyncio

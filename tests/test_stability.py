@@ -21,11 +21,11 @@ def test_effective_models_filters_by_present_keys(monkeypatch):
     # If only OPENAI_API_KEY is present
     monkeypatch.setenv("OPENAI_API_KEY", "sk-fake-openai")
     openai_models = engine.get_effective_models()
-    assert "gpt-4o" in openai_models
-    assert "claude-3-5-haiku-20241022" not in openai_models
+    assert "o3-mini" in openai_models
+    assert "anthropic/claude-3-5-sonnet-20241022" not in openai_models
 
 
 def test_judge_fallback_chain_defined():
     assert len(JUDGE_FALLBACK_CHAIN) >= 3
     assert "gemini/gemini-2.5-flash" in JUDGE_FALLBACK_CHAIN
-    assert "gpt-4o" in JUDGE_FALLBACK_CHAIN
+    assert "o3-mini" in JUDGE_FALLBACK_CHAIN

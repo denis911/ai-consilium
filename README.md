@@ -18,7 +18,7 @@
 Solopreneurs cannot afford $500/hr corporate retainers to cross-check architecture choices or localized tax compliance. However, a single critical hallucination from a standard single-LLM ChatGPT window can derail cloud infrastructure or lead to costly legal errors.
 
 ### The Solution
-AI Consilium transforms unpredictable LLM outputs into an **auditable multi-model consensus engine**. Powered by **LiteLLM**, it asynchronously queries **5 frontier LLM providers** (OpenAI GPT-4o, Anthropic Claude 3.5 Sonnet, Gemini 2.5 Flash, Perplexity Sonar, and DeepSeek-R1 reasoning model) with retrieved local reference context. For zero-cost local testing, it includes a 1-click fallback to 5 free models on OpenRouter (`:free`). It calculates a mathematical **Consensus Score (0–100%)** via 384-dimensional embedding distance, identifies statistical Z-score outliers, runs an LLM-as-a-Judge qualitative synthesis, renders dynamic **Mermaid.js visualizations**, logs telemetry in DuckDB, and exports verified notes directly into a local **Obsidian vault**.
+AI Consilium transforms unpredictable LLM outputs into an **auditable multi-model consensus engine**. Powered by **LiteLLM**, it asynchronously queries **5 frontier LLM providers** (OpenAI o3-mini, Anthropic Claude 3.5 Sonnet, Gemini 2.5 Flash, Perplexity Sonar, and DeepSeek-R1 reasoning model) with retrieved local reference context. For zero-cost local testing, it includes a 1-click fallback to 5 free models on OpenRouter (`:free`). It calculates a mathematical **Consensus Score (0–100%)** via 384-dimensional embedding distance, identifies statistical Z-score outliers, runs an LLM-as-a-Judge qualitative synthesis, renders dynamic **Mermaid.js visualizations**, logs telemetry in DuckDB, and exports verified notes directly into a local **Obsidian vault**.
 
 ### 💡 Project Origin & Personal Motivation
 While the concept of multi-LLM consensus (known in AI research as *Multi-Agent Debate (MAD)* or *Mixture-of-Agents (MoA)*) is an established architectural pattern, **AI Consilium was created out of two real-world motivations:**
@@ -344,7 +344,7 @@ AI Consilium provides two operational model modes designed for different stages 
 ### 2. 🏛️ Frontier Paid Model Tier (`DEFAULT_MODELS`)
 - **Ideal for:** High-stakes architectural decisions, legal/tax compliance research, contract review, and production system design.
 - **Default Roster:**
-  - `gpt-4o` (OpenAI Flagship Reasoner)
+  - `o3-mini` (OpenAI High-Speed Reasoning Model)
   - `anthropic/claude-3-5-sonnet-20241022` (Anthropic Deep Reasoning Model)
   - `gemini/gemini-2.5-flash` (Google 1M-Context Lead Judge)
   - `perplexity/sonar` (Live Web-Grounded Search Signal)
