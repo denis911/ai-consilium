@@ -6,7 +6,7 @@
 [![Package Manager: uv](https://img.shields.io/badge/package_manager-uv-6E40C9.svg)](https://github.com/astral-sh/uv)
 [![Database: DuckDB](https://img.shields.io/badge/database-DuckDB-FFF000.svg)](https://duckdb.org/)
 [![UI: Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B.svg)](https://streamlit.io/)
-[![Tests: 45 Passed](https://img.shields.io/badge/tests-45%20passed-success.svg)](#-test-suite--quality-assurance)
+[![Tests: 48 Passed](https://img.shields.io/badge/tests-48%20passed-success.svg)](#-test-suite--quality-assurance)
 
 ---
 
@@ -331,6 +331,29 @@ Access the application dashboard at `http://localhost:8501`.
 
 ---
 
+## 💡 Frontier Model Selection & Economics Guidance
+
+AI Consilium provides two operational model modes designed for different stages of research:
+
+### 1. ⚡ Zero-Cost Free Model Tier (`OPENROUTER_FREE_MODELS`)
+- **Ideal for:** Rapid development, dry-run testing, offline prototyping, and budget-zero experimentation.
+- **Provider:** 5 free models on OpenRouter (`:free`) including `google/gemma-4-31b-it:free`, `openai/gpt-oss-20b:free`, `cohere/north-mini-code:free`, etc.
+- **Economics:** $0.00 total API cost.
+- **Trade-off:** Free-tier endpoints may occasionally experience rate-limiting or provider queue delays during peak usage.
+
+### 2. 🏛️ Frontier Paid Model Tier (`DEFAULT_MODELS`)
+- **Ideal for:** High-stakes architectural decisions, legal/tax compliance research, contract review, and production system design.
+- **Default Roster:**
+  - `gpt-4o` (OpenAI Flagship Reasoner)
+  - `anthropic/claude-3-5-sonnet-20241022` (Anthropic Deep Reasoning Model)
+  - `gemini/gemini-2.5-flash` (Google 1M-Context Lead Judge)
+  - `perplexity/sonar` (Live Web-Grounded Search Signal)
+  - `openrouter/deepseek/deepseek-r1:free` (Step-by-Step Reasoning Perspective)
+- **Economics:** Because queries are executed asynchronously in short single-turn bursts, a typical multi-model research query costs **less than $0.02 – $0.05 per run**.
+- **Recommendation:** Setting up pay-as-you-go API keys for OpenAI, Anthropic, Gemini, and Perplexity requires a tiny monthly spend (~$2–$5/month for heavy research), yielding maximum reasoning depth, zero rate limits, and professional-grade cross-validation.
+
+---
+
 ## 🧪 Test Suite & Quality Assurance
 
 AI Consilium features an extensive automated test suite covering unit, integration, security, stability, CLI, and end-to-end pipeline benchmarks.
@@ -342,26 +365,37 @@ uv run pytest
 
 ### Test Suite Summary:
 ```text
-collected 45 items
+collected 48 items
 
 tests/test_app.py .                                                      [  2%]
 tests/test_basic.py ..                                                   [  6%]
-tests/test_consensus.py ...                                              [ 13%]
-tests/test_docker.py ..                                                  [ 17%]
-tests/test_eval.py ..                                                    [ 22%]
-tests/test_exporter.py ..                                                [ 26%]
-tests/test_ingest.py ..                                                  [ 31%]
-tests/test_main.py ...                                                   [ 37%]
-tests/test_pipeline.py ..                                                [ 42%]
-tests/test_providers.py ......                                           [ 55%]
-tests/test_rag.py ....                                                   [ 64%]
-tests/test_schemas.py .......                                            [ 80%]
-tests/test_security.py ...                                               [ 86%]
-tests/test_stability.py ..                                               [ 91%]
-tests/test_synthesizer.py ..                                             [ 95%]
+tests/test_consensus.py ...                                              [ 12%]
+tests/test_docker.py ..                                                  [ 16%]
+tests/test_eval.py ..                                                    [ 20%]
+tests/test_exporter.py ..                                                [ 25%]
+tests/test_ingest.py ..                                                  [ 29%]
+tests/test_main.py ...                                                   [ 35%]
+tests/test_pipeline.py ..                                                [ 39%]
+tests/test_providers.py ......                                           [ 52%]
+tests/test_rag.py ....                                                   [ 60%]
+tests/test_schemas.py .......                                            [ 75%]
+tests/test_security.py ...                                               [ 81%]
+tests/test_stability.py ..                                               [ 85%]
+tests/test_synthesizer.py .....                                          [ 95%]
 tests/test_telemetry.py ..                                               [100%]
 
-============================= 45 passed in 33.16s =============================
+============================= 48 passed in 32.29s =============================
+```
+
+### 🛡️ Dual-Review & QA Verification Pipeline:
+Every feature and bug fix in AI Consilium passes through a rigorous **5-Step Dual-Review Pipeline**:
+
+```
+ 1. Coding & Implementation    --->  Primary coding AI (Gemini 3.6 Flash / Antigravity) implements feature requests based on groomed issues.
+ 2. Automated Test Battery     --->  Full test suite (`uv run pytest`) is executed to ensure zero regressions before committing to `main`.
+ 3. Claude Code Review         --->  Independent code review conducted by Claude Staff SDE (logged in `review/YYYY-MM-DD-code-review-Claude.md`).
+ 4. Jules Integrity Review     --->  Secondary review triggered via GitHub issue labeled `[jules]`, evaluated by Google Jules (logged in `review/YYYY-MM-DD-code-review-jules.md`).
+ 5. Grooming & Verification    --->  Review findings are evaluated, groomed into GitHub issues, resolved in code, and verified via automated test battery and manual UI testing.
 ```
 
 ---
