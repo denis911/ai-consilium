@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 # Standard frontier model identifiers for LiteLLM
 DEFAULT_MODELS: List[str] = [
     "gpt-4o",
-    "anthropic/claude-3-5-haiku-20241022",
+    "anthropic/claude-3-5-sonnet-20241022",
     "gemini/gemini-2.5-flash",
     "perplexity/sonar",
-    "xai/grok-2",
+    "openrouter/deepseek/deepseek-r1:free",
 ]
 
 # OpenRouter 100% free model tier fallback identifiers
@@ -73,10 +73,10 @@ class LLMProviderEngine:
         # Filter DEFAULT_MODELS by available API keys
         model_key_mapping = {
             "gpt-4o": "OPENAI_API_KEY",
-            "anthropic/claude-3-5-haiku-20241022": "ANTHROPIC_API_KEY",
+            "anthropic/claude-3-5-sonnet-20241022": "ANTHROPIC_API_KEY",
             "gemini/gemini-2.5-flash": "GEMINI_API_KEY",
             "perplexity/sonar": "PERPLEXITY_API_KEY",
-            "xai/grok-2": "XAI_API_KEY",
+            "openrouter/deepseek/deepseek-r1:free": "OPENROUTER_API_KEY",
         }
 
         available_default_models = [

@@ -102,7 +102,7 @@ def main():
     use_free_tier = st.sidebar.toggle("⚡ OpenRouter $0 Free Model Tier", value=False)
 
     if use_free_tier:
-        st.sidebar.caption("Routing queries to 5 free models on OpenRouter.")
+        st.sidebar.caption("Routing queries to 5 free models on OpenRouter. ℹ️ *Free-tier models have rate limits; switch to frontier models for high-stakes decisions.*")
         selected_models = OPENROUTER_FREE_MODELS
     else:
         st.sidebar.caption("Querying frontier LLM APIs in parallel.")
