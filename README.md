@@ -182,8 +182,11 @@ ai-consilium/
 ├── _docs/                      # SDD Specifications & Architectural Blueprints
 │   ├── mission.md              # Vision, target audience, and core pillars
 │   ├── high_level_spec.md      # Detailed technical specification
-│   ├── knowledge_flywheel_spec.md # Flywheel design document (Cold/Warm start)
-│   └── review/                 # Code review findings & architecture reports
+│   └── knowledge_flywheel_spec.md # Flywheel design document (Cold/Warm start)
+├── review/                     # Senior Staff SDE Code Review & Analysis Reports
+│   ├── 2026-07-29-code-review.md
+│   ├── models2026.txt
+│   └── not-unique.txt
 ├── council/                    # Core Python Package
 │   ├── __init__.py
 │   ├── providers.py            # Async multi-LLM API client manager
