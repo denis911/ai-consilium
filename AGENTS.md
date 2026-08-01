@@ -16,8 +16,8 @@ Workflow & Dual-Review Pipeline
    - After a commit, allow 3–5 minutes for background CI / SonarCloud scanning to complete.
    - Reviewers inspect the codebase while ignoring non-source noise (`uv.lock`, binary databases `*.duckdb`, `.pytest_cache`, `__pycache__`).
    - Every reviewer report MUST start with a standardized YAML frontmatter header (`risk_score: 1-5`, `breaking_changes: true|false`, `effort_estimate: low|medium|high`).
-   - **Claude 3.5 Sonnet (`review/claude-review.md`):** Focuses on *Structural Integrity, Modular Architecture, Documentation, and Test-Coverage Rigor*. Queries SonarCloud MCP (`denis911_ai-consilium`). Results saved to `review/YYYY-MM-DD-code-review-Claude-N.md`.
-   - **Google Jules (`review/jules-review.md`):** Triggered via `[jules]` tagged issue. Performs *Native Idiomatic Code Alignment, DuckDB/LiteLLM Framework Optimizations, & Async Concurrency* audits without Sonar MCP dependency. Results saved to `review/YYYY-MM-DD-code-review-jules-N.md`.
+   - **Claude 3.5 Sonnet (`review/claude-review.md`):** Focuses on *Structural Integrity, Modular Architecture, Security Vulnerability Bounds (Path Traversal, Prompt/SQL Injections via SonarCloud MCP `denis911_ai-consilium`), Documentation, & Test-Coverage Rigor*. Results saved to `review/YYYY-MM-DD-code-review-Claude-N.md`.
+   - **Google Jules (`review/jules-review.md`):** Triggered via `[jules]` tagged issue. Focuses on *Native Idiomatic Code Alignment, DuckDB/LiteLLM Framework Optimizations, Async Concurrency, Boundary/Type Safety, & Algorithmic Performance* without Sonar MCP dependency. Results saved to `review/YYYY-MM-DD-code-review-jules-N.md`.
 4. **Risk-Based Grooming & Consensus Rule:**
    - **High-Priority Critical Items:** Any flaw with `risk_score >= 3` or flagged by **both reviewers** is groomed into a high-priority GitHub issue.
    - **Lower-Priority Quality Refinements:** Single-reviewer nitpicks or low risk items (`risk_score < 3`) are groomed as lower-priority tasks.

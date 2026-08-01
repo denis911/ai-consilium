@@ -10,7 +10,7 @@ labels: [jules]
 **Specialized Persona & Rubric**:
 - Focus on idiomatic Python 3.11+ patterns.
 - Evaluate alignment with Gemini's generated code and framework-specific optimizations (DuckDB, LiteLLM, Streamlit, SentenceTransformers).
-- Audit async concurrency, memory lifecycle, and resource lock safety.
+- Audit async concurrency, memory lifecycle, multi-process resource lock safety, boundary/type safety, and algorithmic performance complexity.
 
 **Execution Constraints**:
 1. Scan source files across the codebase, ignoring non-source noise files (such as `uv.lock`, binary databases `*.duckdb`, `.pytest_cache`, and `__pycache__`).

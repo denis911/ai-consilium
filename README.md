@@ -387,16 +387,16 @@ tests/test_telemetry.py ..                                               [100%]
 ============================= 48 passed in 32.29s =============================
 ```
 
-### 🛡️ Multi-Agent Tri-Review & Quality Assurance Pipeline
+### 🛡️ Multi-Agent Dual-Review & Quality Assurance Pipeline
 
-Every feature and bug fix in AI Consilium passes through a rigorous **5-Step Tri-Review Pipeline** involving three independent AI reviewer personas, SonarCloud MCP static analysis enrichment, and automated test validation:
+Every feature and bug fix in AI Consilium passes through a rigorous **5-Step Dual-Review Pipeline** involving two independent AI reviewer personas, SonarCloud MCP static analysis enrichment, and automated test validation:
 
 ```
  1. Coding & Implementation    --->  Primary coding AI (Gemini 3.6 Flash / Antigravity) implements feature requests based on groomed issues.
  2. Automated Test Battery     --->  Full test suite (`uv run pytest`) is executed to ensure zero regressions before committing to `main`.
  3. SonarCloud & CI Scan       --->  3–5 min background window: SonarCloud scans commit; non-source noise files (`uv.lock`, `*.duckdb`) excluded.
- 4. Tri-Review Audit Phase     --->  Code audited by 3 reviewer personas (Claude 3.5 Sonnet, Google Jules, OpenAI Codex) with optional Sonar MCP data.
- 5. Majority & Risk Grooming   --->  Issues with `risk_score >= 3` or flagged by >=2 reviewers are groomed into High-Priority GitHub Issues.
+ 4. Dual-Review Audit Phase    --->  Code audited by specialized reviewer personas (Claude 3.5 Sonnet & Google Jules) with optional Sonar MCP data.
+ 5. Risk-Based Consensus Groom --->  Issues with `risk_score >= 3` or flagged by both reviewers are groomed into High-Priority GitHub Issues.
 ```
 
 #### 🎭 Specialized Reviewer Personas & Noise Reduction Matrix
@@ -405,13 +405,12 @@ Rather than having reviewers search for generic bugs redundantly, each reviewer 
 
 | Reviewer Agent | Instruction Spec File | Target Log Location | Specialized Rubric & MCP Integration |
 | :--- | :--- | :--- | :--- |
-| **Claude 3.5 Sonnet** | [`review/claude-review.md`](file:///c:/tmp/ai-consilium/review/claude-review.md) | `review/YYYY-MM-DD-code-review-Claude-N.md` | **Structural Architecture & Test Rigor:** Modular design, docstring completeness, test assertion depth. Queries SonarQube MCP (`denis911_ai-consilium`). |
-| **Google Jules** | [`review/jules-review.md`](file:///c:/tmp/ai-consilium/review/jules-review.md) | `review/YYYY-MM-DD-code-review-jules-N.md` | **Framework & Concurrency Optimization:** Native Python 3.11+ patterns, DuckDB/LiteLLM alignment, async lock safety. No external Sonar dependency. |
-| **OpenAI Codex** | [`review/codex-review.md`](file:///c:/tmp/ai-consilium/review/codex-review.md) | `review/YYYY-MM-DD-code-review-Codex-N.md` | **Security & Algorithmic Performance:** Vulnerability boundaries (path/SQL injection), edge cases, complexity. Queries SonarQube MCP (`denis911_ai-consilium`). |
+| **Claude 3.5 Sonnet** | [`review/claude-review.md`](file:///c:/tmp/ai-consilium/review/claude-review.md) | `review/YYYY-MM-DD-code-review-Claude-N.md` | **Structural Architecture, Security & Test Rigor:** Modular design, security vulnerability audit (path traversal, prompt/SQL injection via SonarCloud MCP `denis911_ai-consilium`), docstring completeness, and test assertion depth. |
+| **Google Jules** | [`review/jules-review.md`](file:///c:/tmp/ai-consilium/review/jules-review.md) | `review/YYYY-MM-DD-code-review-jules-N.md` | **Framework, Concurrency & Boundary Performance:** Native Python 3.11+ patterns, DuckDB/LiteLLM alignment, multi-process resource lock safety, boundary/type safety, and algorithmic complexity. |
 
-#### 🗳️ "Two-Out-Of-Three" Majority & Risk Consensus Rule
-- **High-Priority Critical Items:** Any logic, security, performance, or structural flaw with `risk_score >= 3` or flagged by **at least 2 out of 3 reviewers** is groomed into a high-priority GitHub issue for immediate resolution.
-- **Lower-Priority Quality Refinements:** Single-reviewer nitpicks or low risk items (`risk_score < 3`) are groomed as lower-priority backlog refinements.
+#### 🗳️ Risk-Based Consensus Grooming Rule
+- **High-Priority Critical Items:** Any logic, security, performance, or structural flaw with `risk_score >= 3` or flagged by **both reviewers** is groomed into a high-priority GitHub issue for immediate resolution.
+- **Lower-Priority Quality Refinements:** Single-reviewer nitpicks or low-risk items (`risk_score < 3`) are groomed as lower-priority backlog refinements.
 
 ---
 

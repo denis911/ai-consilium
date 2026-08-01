@@ -9,6 +9,7 @@ labels: [claude]
 
 **Specialized Persona & Rubric**:
 - Structural integrity, clean separation of concerns, and modular design.
+- Security vulnerability audit (path traversal, prompt injection, raw SQL/DuckDB injection, secrets isolation via SonarCloud MCP).
 - Documentation completeness, docstrings, and README sitemap alignment.
 - Test-coverage completeness, assertion depth, and edge-case test suite validation.
 
