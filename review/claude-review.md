@@ -13,7 +13,15 @@ labels: [claude]
 - Test-coverage completeness, assertion depth, and edge-case test suite validation.
 
 **Execution Constraints**:
-1. Scan all files modified in the latest commit(s).
+1. Scan source files across the codebase, ignoring non-source noise files (such as `uv.lock`, binary databases `*.duckdb`, `.pytest_cache`, and `__pycache__`).
 2. Evaluate architectural elegance, docstrings, and test completeness without editing source code.
 3. **CRITICAL**: Do NOT change, refactor, or edit any existing source files. You are explicitly restricted from modifying application code.
-4. Save your findings into a single markdown file located at: `review/YYYY-MM-DD-code-review-Claude.md` (increment to `-2.md`, `-3.md`, etc., if multiple runs occur on the same day).
+4. Save findings into a single markdown file located at: `review/YYYY-MM-DD-code-review-Claude.md` (increment to `-2.md`, `-3.md`, etc., if multiple runs occur on the same day).
+5. **Metadata Header Requirement**: Every generated review report MUST include a top YAML frontmatter block formatted as:
+   ```yaml
+   ---
+   risk_score: 1-5 # 1=Low, 5=Critical
+   breaking_changes: true|false
+   effort_estimate: low|medium|high
+   ---
+   ```
