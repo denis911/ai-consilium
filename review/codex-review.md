@@ -14,14 +14,18 @@ labels: [codex]
 
 **Execution Constraints**:
 1. Scan source files across the codebase, ignoring non-source noise files (such as `uv.lock`, binary databases `*.duckdb`, `.pytest_cache`, and `__pycache__`).
-2. Audit security boundaries, edge cases, and algorithm performance without editing source code.
-3. **CRITICAL**: Do NOT change, refactor, or edit any existing source files. You are explicitly restricted from modifying application code.
-4. Save your findings into a single markdown file located at: `review/YYYY-MM-DD-code-review-Codex.md` (increment to `-2.md`, `-3.md`, etc., if multiple runs occur on the same day).
-5. **Metadata Header Requirement**: Every generated review report MUST include a top YAML frontmatter block formatted as:
+2. **Optional SonarCloud MCP Enrichment**: Attempt to query SonarQube MCP (`projectKey: denis911_ai-consilium`) for security hotspots, vulnerability ratings, and cognitive complexity metrics.
+   - Treat Sonar data as strictly **optional**—if SonarCloud or MCP is unavailable, skip it gracefully and proceed with native code review.
+   - **Filter Python Glitches**: Filter out Java-centric or non-idiomatic static analysis false positives.
+3. Audit security boundaries, edge cases, and algorithm performance without editing source code.
+4. **CRITICAL**: Do NOT change, refactor, or edit any existing source files. You are explicitly restricted from modifying application code.
+5. Save your findings into a single markdown file located at: `review/YYYY-MM-DD-code-review-Codex.md` (increment to `-2.md`, `-3.md`, etc., if multiple runs occur on the same day).
+6. **Metadata Header Requirement**: Every generated review report MUST include a top YAML frontmatter block formatted as:
    ```yaml
    ---
    risk_score: 1-5 # 1=Low, 5=Critical
    breaking_changes: true|false
    effort_estimate: low|medium|high
+   sonar_status: PASSED|FAILED|SKIPPED
    ---
    ```
