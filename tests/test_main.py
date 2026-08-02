@@ -44,7 +44,10 @@ async def test_run_cli_mocked(tmp_path, capsys):
 
     with patch("council.providers.LLMProviderEngine.query_concurrently", new_callable=AsyncMock, return_value=mock_resp), \
          patch("council.synthesizer.LLMJudgeSynthesizer.synthesize", new_callable=AsyncMock, return_value=mock_artifact), \
-         patch("council.telemetry.DuckDBTelemetryLogger.log_query_run", return_value="run-123"):
+         patch("main.DuckDBTelemetryLogger") as mock_telemetry:
+        mock_instance = MagicMock()
+        mock_instance.log_query_run.return_value = "run-123"
+        mock_telemetry.return_value = mock_instance
 
         await run_cli(args)
 

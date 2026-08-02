@@ -40,7 +40,7 @@ This project was built from the ground up to fulfill every requirement of the [D
 | **4. Monitoring & Observability** | **6 / 6 points** | Built-in DuckDB `query_logs` tracking query parameters, individual model latencies, token counts, estimated API costs, consensus scores, and **User Feedback (+1 / -1 thumbs ratings)**. |
 | **5. User Interface** | **6 / 6 points** | **Dual-mode interface:** 1) Interactive **Streamlit Web Application** (`app.py`) featuring real-time query progress bars, interactive consensus gauges, live Mermaid.js diagram rendering, user feedback buttons, and Obsidian export. 2) Command-line **CLI mode** (`python main.py --query "..."`). |
 | **6. Deployment & Containerization** | **6 / 6 points** | Fully containerized with a multi-stage `Dockerfile` (using `uv`) and `docker-compose.yml` for single-command startup (`docker compose up`) with `.dockerignore` security isolation. |
-| **7. Reproducibility & Environment** | **4 / 4 points** | Built using **`uv`** (`pyproject.toml` + `uv.lock`) for lightning-fast, deterministic dependency resolution. Includes `.env.example`, automated setup scripts, 45 automated unit/integration tests, and clean documentation. |
+| **7. Reproducibility & Environment** | **4 / 4 points** | Built using **`uv`** (`pyproject.toml` + `uv.lock`) for lightning-fast, deterministic dependency resolution. Includes `.env.example`, automated setup scripts, 48 automated unit/integration tests, and clean documentation. |
 | **TOTAL** | **36 / 36 points** | **Maximum possible score across all 7 evaluation categories.** |
 
 ---
@@ -54,7 +54,7 @@ AI Consilium goes beyond traditional single-model RAG question-answering systems
 - ⚡ **100% Free & Zero-Cost Developer Mode:** Features a 1-click fallback to 5 free models on OpenRouter (`:free`) and local CPU embeddings (`all-MiniLM-L6-v2`), requiring $0 API budget to test and run.
 - 📂 **Native Obsidian Vault Integration:** Exports structured `.md` research notes with YAML frontmatter, tags, agreement lists, and embedded Mermaid charts directly into local knowledge bases (`OBSIDIAN_VAULT_PATH`).
 - 📊 **Embedded DuckDB Telemetry & RAG:** Zero-dependency local persistence using DuckDB for both hybrid dense/sparse RAG search and execution query logging (`TIMESTAMP`, token counts, latencies, estimated costs, user ratings).
-- 🧪 **Spec-Driven Software Engineering:** Built with strict Spec-Driven Design (SDD), Pydantic v2 data contracts, Hatchling, security prompt boundaries, and 45 automated unit & integration tests with 100% pass rate.
+- 🧪 **Spec-Driven Software Engineering:** Built with strict Spec-Driven Design (SDD), Pydantic v2 data contracts, Hatchling, security prompt boundaries, and 48 automated unit & integration tests with 100% pass rate.
 
 ---
 
@@ -183,10 +183,10 @@ ai-consilium/
 │   ├── mission.md              # Vision, target audience, and core pillars
 │   ├── high_level_spec.md      # Detailed technical specification
 │   └── knowledge_flywheel_spec.md # Flywheel design document (Cold/Warm start)
-├── review/                     # Senior Staff SDE Code Review & Analysis Reports
-│   ├── 2026-07-29-code-review.md
-│   ├── models2026.txt
-│   └── not-unique.txt
+├── review/                     # Multi-Agent Code Review Specs & Analysis Reports
+│   ├── claude-review.md        # Claude Structural & SonarCloud MCP review spec
+│   ├── jules-review.md         # Google Jules framework & concurrency review spec
+│   └── ...                     # Historical & daily versioned audit logs
 ├── council/                    # Core Python Package
 │   ├── __init__.py
 │   ├── providers.py            # Async multi-LLM API client manager
