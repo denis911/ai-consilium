@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 # Standard frontier model identifiers for LiteLLM
 DEFAULT_MODELS: List[str] = [
     "o3-mini",
-    "anthropic/claude-3-5-sonnet-latest",
+    "anthropic/claude-3-5-sonnet-20240620",
     "gemini/gemini-2.5-flash",
     "perplexity/sonar",
-    "xai/grok-2-latest",
+    "xai/grok-2-1212",
     "openrouter/deepseek/deepseek-r1",
 ]
 
@@ -46,8 +46,10 @@ class LLMProviderEngine:
 
     def __init__(self, default_timeout: float = 30.0):
         self.default_timeout = default_timeout
-        # Silence excessive verbose logs from litellm
+        # Silence excessive verbose logs & background workers from litellm
         litellm.suppress_debug_info = True
+        litellm.turn_off_message_logging = True
+        litellm.telemetry = False
 
     def get_effective_models(
         self,
@@ -74,10 +76,10 @@ class LLMProviderEngine:
         # Filter DEFAULT_MODELS by available API keys
         model_key_mapping = {
             "o3-mini": "OPENAI_API_KEY",
-            "anthropic/claude-3-5-sonnet-latest": "ANTHROPIC_API_KEY",
+            "anthropic/claude-3-5-sonnet-20240620": "ANTHROPIC_API_KEY",
             "gemini/gemini-2.5-flash": "GEMINI_API_KEY",
             "perplexity/sonar": "PERPLEXITY_API_KEY",
-            "xai/grok-2-latest": "XAI_API_KEY",
+            "xai/grok-2-1212": "XAI_API_KEY",
             "openrouter/deepseek/deepseek-r1": "OPENROUTER_API_KEY",
         }
 
@@ -98,26 +100,29 @@ class LLMProviderEngine:
         """Query a single LLM provider with latency tracking and error isolation."""
         timeout_val = timeout or self.default_timeout
         start_time = time.perf_counter()
-
-        # Add OpenRouter referrer headers if targeting an OpenRouter model
-        if model_name.startswith("openrouter/"):
-            headers = kwargs.get("extra_headers", {})
-            headers.update({
-                "HTTP-Referer": "https://github.com/denis911/ai-consilium",
-                "X-Title": "AI Consilium Dual-Engine Consensus Agent",
-            })
-            kwargs["extra_headers"] = headers
-
         try:
-            response = await asyncio.wait_for(
-                litellm.acompletion(
-                    model=model_name,
-                    messages=messages,
-                    **kwargs
-                ),
-                timeout=timeout_val,
-            )
+            kwargs: Dict[str, Any] = {
+                "model": model_name,
+                "messages": messages,
+                "timeout": timeout_val,
+            }
 
+            # Add OpenRouter referrer headers if targeting an OpenRouter model
+            if model_name.startswith("openrouter/"):
+                headers = kwargs.get("extra_headers", {})
+                headers.update({
+                    "HTTP-Referer": "https://github.com/denis911/ai-consilium",
+                    "X-Title": "AI Consilium Dual-Engine Consensus Agent",
+                })
+                kwargs["extra_headers"] = headers
+
+            if timeout_val and timeout_val > 0:
+                response = await asyncio.wait_for(
+                    litellm.acompletion(**kwargs),
+                    timeout=timeout_val,
+                )
+            else:
+                response = await litellm.acompletion(**kwargs)
             latency_ms = (time.perf_counter() - start_time) * 1000.0
 
             # Extract output text
@@ -136,7 +141,13 @@ class LLMProviderEngine:
 
             cost_usd = 0.0
             try:
-                cost_usd = float(litellm.completion_cost(completion_response=response) or 0.0)
+                cost_val = litellm.completion_cost(completion_response=response)
+                if isinstance(cost_val, dict):
+                    cost_usd = float(cost_val.get("total_cost", 0.0) or 0.0)
+                elif isinstance(cost_val, (int, float)):
+                    cost_usd = float(cost_val)
+                else:
+                    cost_usd = float(cost_val or 0.0)
             except Exception:
                 cost_usd = 0.0
 
