@@ -8,7 +8,8 @@ import streamlit as st
 from dotenv import load_dotenv
 
 # Load environment variables from .env
-load_dotenv()
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 
 from council.schemas import ConsiliumQueryInput
 from council.providers import LLMProviderEngine, DEFAULT_MODELS, OPENROUTER_FREE_MODELS
@@ -80,6 +81,32 @@ def run_async(coro):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return loop.run_until_complete(coro)
+
+
+def render_mermaid_diagram(mermaid_code: str, height: int = 380):
+    """Render a responsive Mermaid diagram with auto-fit styling."""
+    html_code = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+      <style>
+        body {{ margin: 0; padding: 5px; background: transparent; font-family: system-ui, sans-serif; display: flex; justify-content: center; align-items: center; }}
+        .mermaid {{ width: 100%; max-width: 100%; text-align: center; overflow-x: auto; }}
+        svg {{ max-width: 100% !important; height: auto !important; max-height: 350px; }}
+      </style>
+    </head>
+    <body>
+      <div class="mermaid">
+        {mermaid_code}
+      </div>
+      <script>
+        mermaid.initialize({{ startOnLoad: true, theme: 'dark', flowchart: {{ useMaxWidth: true, htmlLabels: true }} }});
+      </script>
+    </body>
+    </html>
+    """
+    st.components.v1.html(html_code, height=height, scrolling=True)
 
 
 def main():
@@ -259,7 +286,9 @@ def main():
             with col_right:
                 st.markdown("### 📊 Consensus Process Diagram")
                 if artifact.mermaid_code:
-                    st.code(artifact.mermaid_code, language="mermaid")
+                    render_mermaid_diagram(artifact.mermaid_code)
+                    with st.expander("📄 View Raw Mermaid Code (Copy for Obsidian)"):
+                        st.code(artifact.mermaid_code, language="mermaid")
                 else:
                     st.info("No diagram code generated.")
 

@@ -11,6 +11,9 @@ import litellm
 
 from council.schemas import ModelResponsePayload, ConsiliumQueryInput
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
+
 logger = logging.getLogger(__name__)
 
 # Standard frontier model identifiers for LiteLLM
