@@ -16,19 +16,20 @@ logger = logging.getLogger(__name__)
 # Standard frontier model identifiers for LiteLLM
 DEFAULT_MODELS: List[str] = [
     "o3-mini",
-    "anthropic/claude-3-5-sonnet-20241022",
+    "anthropic/claude-3-5-sonnet-latest",
     "gemini/gemini-2.5-flash",
     "perplexity/sonar",
-    "openrouter/deepseek/deepseek-r1:free",
+    "xai/grok-2-latest",
+    "openrouter/deepseek/deepseek-r1",
 ]
 
 # OpenRouter 100% free model tier fallback identifiers
 OPENROUTER_FREE_MODELS: List[str] = [
-    "openrouter/google/gemma-4-31b-it:free",
-    "openrouter/openai/gpt-oss-20b:free",
-    "openrouter/inclusionai/ling-3.0-flash:free",
+    "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+    "openrouter/google/gemma-3-27b-it:free",
+    "openrouter/qwen/qwen-2.5-coder-32b-instruct:free",
     "openrouter/cohere/north-mini-code:free",
-    "openrouter/poolside/laguna-s-2.1:free",
+    "openrouter/inclusionai/ling-3.0-flash:free",
 ]
 
 PRIMARY_PROVIDER_KEYS: List[str] = [
@@ -73,10 +74,11 @@ class LLMProviderEngine:
         # Filter DEFAULT_MODELS by available API keys
         model_key_mapping = {
             "o3-mini": "OPENAI_API_KEY",
-            "anthropic/claude-3-5-sonnet-20241022": "ANTHROPIC_API_KEY",
+            "anthropic/claude-3-5-sonnet-latest": "ANTHROPIC_API_KEY",
             "gemini/gemini-2.5-flash": "GEMINI_API_KEY",
             "perplexity/sonar": "PERPLEXITY_API_KEY",
-            "openrouter/deepseek/deepseek-r1:free": "OPENROUTER_API_KEY",
+            "xai/grok-2-latest": "XAI_API_KEY",
+            "openrouter/deepseek/deepseek-r1": "OPENROUTER_API_KEY",
         }
 
         available_default_models = [
