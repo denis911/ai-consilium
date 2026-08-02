@@ -22,7 +22,7 @@ def test_effective_models_filters_by_present_keys(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "sk-fake-openai")
     openai_models = engine.get_effective_models()
     assert "o3-mini" in openai_models
-    assert "anthropic/claude-3-5-sonnet-20240620" not in openai_models
+    assert "anthropic/claude-sonnet-5" not in openai_models
 
 
 def test_judge_fallback_chain_defined():

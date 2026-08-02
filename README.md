@@ -364,10 +364,10 @@ AI Consilium provides two operational model modes designed for different stages 
 - **Ideal for:** High-stakes architectural decisions, legal/tax compliance research, contract review, and production system design.
 - **Default Roster:**
   - `o3-mini` (OpenAI High-Speed Reasoning Model)
-  - `anthropic/claude-3-5-sonnet-latest` (Anthropic Deep Reasoning Model)
+  - `anthropic/claude-sonnet-5` (Anthropic Deep Reasoning Model)
   - `gemini/gemini-2.5-flash` (Google 1M-Context Lead Judge)
   - `perplexity/sonar` (Live Web-Grounded Search Signal)
-  - `xai/grok-2-latest` (xAI Grok Reasoning Signal)
+  - `xai/grok-4.5` (xAI Grok Reasoning Signal)
   - `openrouter/deepseek/deepseek-r1` (DeepSeek Reasoning Perspective)
 - **Economics:** Because queries are executed asynchronously in short single-turn bursts, a typical multi-model research query costs **less than $0.02 – $0.05 per run**.
 - **Recommendation:** Setting up pay-as-you-go API keys for OpenAI, Anthropic, Gemini, Perplexity, and xAI requires a tiny monthly spend (~$2–$5/month for heavy research), yielding maximum reasoning depth, zero rate limits, and professional-grade cross-validation.

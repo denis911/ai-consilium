@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 # Standard frontier model identifiers for LiteLLM
 DEFAULT_MODELS: List[str] = [
     "o3-mini",
-    "anthropic/claude-3-5-sonnet-20240620",
+    "anthropic/claude-sonnet-5",
     "gemini/gemini-2.5-flash",
     "perplexity/sonar",
-    "xai/grok-2-1212",
+    "xai/grok-4.5",
     "openrouter/deepseek/deepseek-r1",
 ]
 
@@ -76,10 +76,10 @@ class LLMProviderEngine:
         # Filter DEFAULT_MODELS by available API keys
         model_key_mapping = {
             "o3-mini": "OPENAI_API_KEY",
-            "anthropic/claude-3-5-sonnet-20240620": "ANTHROPIC_API_KEY",
+            "anthropic/claude-sonnet-5": "ANTHROPIC_API_KEY",
             "gemini/gemini-2.5-flash": "GEMINI_API_KEY",
             "perplexity/sonar": "PERPLEXITY_API_KEY",
-            "xai/grok-2-1212": "XAI_API_KEY",
+            "xai/grok-4.5": "XAI_API_KEY",
             "openrouter/deepseek/deepseek-r1": "OPENROUTER_API_KEY",
         }
 
@@ -93,12 +93,8 @@ class LLMProviderEngine:
     def _get_openrouter_fallback_slug(self, model_name: str) -> Optional[str]:
         """Map direct provider model slugs to OpenRouter fallback endpoints."""
         mapping = {
-            "anthropic/claude-3-5-sonnet-20240620": "openrouter/anthropic/claude-3.5-sonnet",
-            "anthropic/claude-3-5-sonnet-20241022": "openrouter/anthropic/claude-3.5-sonnet",
-            "anthropic/claude-3-5-sonnet-latest": "openrouter/anthropic/claude-3.5-sonnet",
-            "xai/grok-2-1212": "openrouter/x-ai/grok-2",
-            "xai/grok-2": "openrouter/x-ai/grok-2",
-            "xai/grok-2-latest": "openrouter/x-ai/grok-2",
+            "anthropic/claude-sonnet-5": "openrouter/anthropic/claude-sonnet-5",
+            "xai/grok-4.5": "openrouter/x-ai/grok-4.5",
             "o3-mini": "openrouter/openai/o3-mini",
         }
         return mapping.get(model_name)

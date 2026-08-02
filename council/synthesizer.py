@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 JUDGE_FALLBACK_CHAIN = [
     "gemini/gemini-2.5-flash",
     "o3-mini",
-    "anthropic/claude-3-5-sonnet-20240620",
-    "xai/grok-2-1212",
+    "anthropic/claude-sonnet-5",
+    "xai/grok-4.5",
     "openrouter/google/gemma-3-27b-it:free",
 ]
 
