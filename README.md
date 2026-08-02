@@ -281,6 +281,7 @@ Launch the full interactive web dashboard featuring live provider progress bars,
 uv sync
 
 # Launch Web UI (Access at http://localhost:8501)
+# NB: please wait 20-30 sec for streamlit app to populate the screen
 uv run streamlit run app.py
 ```
 
