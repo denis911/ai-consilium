@@ -90,6 +90,19 @@ class LLMProviderEngine:
 
         return available_default_models if available_default_models else DEFAULT_MODELS
 
+    def _get_openrouter_fallback_slug(self, model_name: str) -> Optional[str]:
+        """Map direct provider model slugs to OpenRouter fallback endpoints."""
+        mapping = {
+            "anthropic/claude-3-5-sonnet-20240620": "openrouter/anthropic/claude-3.5-sonnet",
+            "anthropic/claude-3-5-sonnet-20241022": "openrouter/anthropic/claude-3.5-sonnet",
+            "anthropic/claude-3-5-sonnet-latest": "openrouter/anthropic/claude-3.5-sonnet",
+            "xai/grok-2-1212": "openrouter/x-ai/grok-2",
+            "xai/grok-2": "openrouter/x-ai/grok-2",
+            "xai/grok-2-latest": "openrouter/x-ai/grok-2",
+            "o3-mini": "openrouter/openai/o3-mini",
+        }
+        return mapping.get(model_name)
+
     async def _query_single_provider(
         self,
         model_name: str,
@@ -101,7 +114,7 @@ class LLMProviderEngine:
         timeout_val = timeout or self.default_timeout
         start_time = time.perf_counter()
         try:
-            kwargs: Dict[str, Any] = {
+            call_kwargs: Dict[str, Any] = {
                 "model": model_name,
                 "messages": messages,
                 "timeout": timeout_val,
@@ -109,20 +122,44 @@ class LLMProviderEngine:
 
             # Add OpenRouter referrer headers if targeting an OpenRouter model
             if model_name.startswith("openrouter/"):
-                headers = kwargs.get("extra_headers", {})
+                headers = call_kwargs.get("extra_headers", {})
                 headers.update({
                     "HTTP-Referer": "https://github.com/denis911/ai-consilium",
                     "X-Title": "AI Consilium Dual-Engine Consensus Agent",
                 })
-                kwargs["extra_headers"] = headers
+                call_kwargs["extra_headers"] = headers
 
-            if timeout_val and timeout_val > 0:
-                response = await asyncio.wait_for(
-                    litellm.acompletion(**kwargs),
-                    timeout=timeout_val,
-                )
-            else:
-                response = await litellm.acompletion(**kwargs)
+            try:
+                if timeout_val and timeout_val > 0:
+                    response = await asyncio.wait_for(
+                        litellm.acompletion(**call_kwargs),
+                        timeout=timeout_val,
+                    )
+                else:
+                    response = await litellm.acompletion(**call_kwargs)
+            except Exception as direct_err:
+                # If direct provider API fails and OPENROUTER_API_KEY is present, attempt OpenRouter fallback
+                openrouter_key = os.environ.get("OPENROUTER_API_KEY")
+                fallback_slug = self._get_openrouter_fallback_slug(model_name)
+                if openrouter_key and fallback_slug and not model_name.startswith("openrouter/"):
+                    logger.info(f"Direct query to {model_name} failed ({direct_err}). Attempting OpenRouter fallback ({fallback_slug})...")
+                    call_kwargs["model"] = fallback_slug
+                    headers = call_kwargs.get("extra_headers", {})
+                    headers.update({
+                        "HTTP-Referer": "https://github.com/denis911/ai-consilium",
+                        "X-Title": "AI Consilium Dual-Engine Consensus Agent",
+                    })
+                    call_kwargs["extra_headers"] = headers
+                    if timeout_val and timeout_val > 0:
+                        response = await asyncio.wait_for(
+                            litellm.acompletion(**call_kwargs),
+                            timeout=timeout_val,
+                        )
+                    else:
+                        response = await litellm.acompletion(**call_kwargs)
+                else:
+                    raise direct_err
+
             latency_ms = (time.perf_counter() - start_time) * 1000.0
 
             # Extract output text

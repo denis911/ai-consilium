@@ -27,6 +27,26 @@ JUDGE_FALLBACK_CHAIN = [
 ]
 
 
+def _sanitize_mermaid_code(code: str) -> str:
+    """Sanitize invalid Mermaid syntax (such as 'A & B --> C')."""
+    if not code:
+        return ""
+    cleaned = code.replace("```mermaid", "").replace("```", "").strip()
+    lines = cleaned.split("\n")
+    cleaned_lines = []
+    for line in lines:
+        if " & " in line and "-->" in line:
+            parts = line.split("-->")
+            if len(parts) == 2:
+                left, right = parts[0].strip(), parts[1].strip()
+                left_nodes = [n.strip() for n in left.split("&")]
+                for node in left_nodes:
+                    cleaned_lines.append(f"  {node} --> {right}")
+                continue
+        cleaned_lines.append(line)
+    return "\n".join(cleaned_lines)
+
+
 class LLMJudgeSynthesizer:
     """Synthesizer module using a lead LLM to evaluate multi-model consensus and contradictions."""
 
@@ -92,7 +112,7 @@ class LLMJudgeSynthesizer:
             "Return a single JSON object with the following exact keys:\n"
             "- \"agreement_points\": list of strings summarizing key points of unanimous consensus\n"
             "- \"contradictions\": list of objects with {\"topic\": string, \"description\": string, \"conflicting_models\": list of strings}\n"
-            "- \"mermaid_code\": valid Mermaid.js diagram code visualizing the workflow or trade-offs\n"
+            "- \"mermaid_code\": valid Mermaid.js diagram code visualizing the workflow or trade-offs (DO NOT use 'A & B --> C' syntax)\n"
             "- \"obsidian_title\": recommended note title string (kebab-case)\n"
             "- \"tags\": list of 3-5 relevance tags\n"
         )
@@ -192,12 +212,14 @@ class LLMJudgeSynthesizer:
                     for c in parsed.get("contradictions", [])
                 ]
 
+                mermaid_code = _sanitize_mermaid_code(str(parsed.get("mermaid_code", "")))
+
                 return ConsiliumFinalArtifact(
                     query=query_input.query,
                     consensus_score=consensus_metrics.consensus_score,
                     agreement_points=list(parsed.get("agreement_points", [])),
                     contradictions=contradiction_objs,
-                    mermaid_code=str(parsed.get("mermaid_code", "")),
+                    mermaid_code=mermaid_code,
                     obsidian_title=str(parsed.get("obsidian_title", "consensus-research")),
                     tags=list(parsed.get("tags", ["consensus", "research"])),
                     responses=responses,
@@ -221,8 +243,8 @@ class LLMJudgeSynthesizer:
             consensus_score=consensus_metrics.consensus_score,
             agreement_points=fallback_agreements,
             contradictions=[],
-            mermaid_code=fallback_mermaid,
-            obsidian_title="consensus-research-report",
-            tags=["consensus", "research"],
+            mermaid_code=_sanitize_mermaid_code(fallback_mermaid),
+            obsidian_title="consensus-research-fallback",
+            tags=["consensus", "fallback"],
             responses=responses,
         )
