@@ -28,7 +28,7 @@ JUDGE_FALLBACK_CHAIN = [
 
 
 def _sanitize_mermaid_code(code: str) -> str:
-    """Sanitize invalid Mermaid syntax (such as 'A -- Text --> B', unquoted parens, or 'A & B --> C')."""
+    """Sanitize invalid Mermaid syntax (such as unquoted decision node parens, 'A -- Text --> B', or 'A & B --> C')."""
     if not code:
         return ""
     cleaned = code.replace("```mermaid", "").replace("```", "").strip()
@@ -36,6 +36,19 @@ def _sanitize_mermaid_code(code: str) -> str:
     cleaned_lines = []
     for line in lines:
         l = line
+        # Clean out 'Unsupported markdown: list' hallucinations
+        l = l.replace("Unsupported markdown: list", "Key Factors & Trade-offs")
+
+        # Fix decision nodes with unquoted text containing parens or special chars: C{Text (parens)?} -> C{"Text (parens)?"}
+        def fix_decision_node(m):
+            node_id = m.group(1)
+            content = m.group(2).strip()
+            if not (content.startswith('"') and content.endswith('"')):
+                content = f'"{content}"'
+            return f'{node_id}{{{content}}}'
+
+        l = re.sub(r'(\b[A-Za-z0-9_]+)\{([^}]+)\}', fix_decision_node, l)
+
         # Fix 'A -- Text --> B' pattern to valid 'A -->|Text| B'
         l = re.sub(r'(\b\w+)\s+--\s+([^\-\>]+)\s+-->\s+(\b\w+)', r'\1 -->|\2| \3', l)
 
@@ -45,7 +58,9 @@ def _sanitize_mermaid_code(code: str) -> str:
             content = m.group(2).strip()
             if content.startswith("(") and content.endswith(")"):
                 content = content[1:-1]
-            return f'{node_id}["{content}"]'
+            if not (content.startswith('"') and content.endswith('"')):
+                content = f'"{content}"'
+            return f'{node_id}[{content}]'
 
         l = re.sub(r'(\b[A-Za-z0-9_]+)\(([^)]*[\(\:\-][^)]*)\)', fix_node_parens, l)
 
