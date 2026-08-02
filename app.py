@@ -111,7 +111,10 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.subheader("🔑 Active API Keys")
     st.sidebar.text(f"OpenAI: {'✅' if os.environ.get('OPENAI_API_KEY') else '❌'}")
+    st.sidebar.text(f"Anthropic: {'✅' if os.environ.get('ANTHROPIC_API_KEY') else '❌'}")
     st.sidebar.text(f"Gemini: {'✅' if os.environ.get('GEMINI_API_KEY') else '❌'}")
+    st.sidebar.text(f"Perplexity: {'✅' if os.environ.get('PERPLEXITY_API_KEY') else '❌'}")
+    st.sidebar.text(f"xAI: {'✅' if os.environ.get('XAI_API_KEY') else '❌'}")
     st.sidebar.text(f"OpenRouter: {'✅' if os.environ.get('OPENROUTER_API_KEY') else '❌'}")
 
     # Tabs
