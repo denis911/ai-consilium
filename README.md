@@ -1,6 +1,6 @@
 # AI Consilium — Dual-Engine Consensus Research Agent
 
-> **LLM Zoomcamp Capstone Project** | **Spec-Driven Design (SDD)** | **Production-Hardened Architecture**
+> **LLM Zoomcamp Capstone Project** | **Spec-Driven Design (SDD)** | **Multi-Model Consensus Architecture**
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Package Manager: uv](https://img.shields.io/badge/package_manager-uv-6E40C9.svg)](https://github.com/astral-sh/uv)
@@ -12,19 +12,19 @@
 
 ## 📌 Executive Summary & Vision
 
-**AI Consilium** is an open-source, deterministic research harness tailored for **high-stakes solopreneurs and startup founders** acting as their own legal, accounting, and technical infrastructure teams.
+**AI Consilium** is an open-source multi-model consensus research harness tailored for **solopreneurs and startup founders** acting as their own legal, accounting, and technical infrastructure teams.
 
 ### The Pain Point
-Solopreneurs cannot afford $500/hr corporate retainers to cross-check architecture choices or localized tax compliance. However, a single critical hallucination from a standard single-LLM ChatGPT window can derail cloud infrastructure or lead to costly legal errors.
+Solopreneurs cannot afford $500/hr corporate retainers to cross-check architecture choices or localized tax compliance. However, relying on a single LLM response can carry blind spots, hallucinations, or biased assumptions.
 
 ### The Solution
-AI Consilium transforms unpredictable LLM outputs into an **auditable multi-model consensus engine**. Powered by **LiteLLM**, it asynchronously queries **5 frontier LLM providers** (OpenAI o3-mini, Anthropic Claude 3.5 Sonnet, Gemini 2.5 Flash, Perplexity Sonar, and DeepSeek-R1 reasoning model) with retrieved local reference context. For zero-cost local testing, it includes a 1-click fallback to 5 free models on OpenRouter (`:free`). It calculates a mathematical **Consensus Score (0–100%)** via 384-dimensional embedding distance, identifies statistical Z-score outliers, runs an LLM-as-a-Judge qualitative synthesis, renders dynamic **Mermaid.js visualizations**, logs telemetry in DuckDB, and exports verified notes directly into a local **Obsidian vault**.
+AI Consilium transforms unpredictable LLM outputs into an **auditable multi-model consensus workflow**. Powered by **LiteLLM**, it asynchronously queries **5 frontier LLM providers** (OpenAI o3-mini, Anthropic Claude 3.5 Sonnet, Gemini 2.5 Flash, Perplexity Sonar, and DeepSeek-R1 reasoning model) with retrieved local reference context. For zero-cost local testing, it includes a 1-click fallback to 5 free models on OpenRouter (`:free`). It calculates a mathematical **Consensus Score (0–100%)** via 384-dimensional embedding distance, identifies statistical Z-score outliers, runs an LLM-as-a-Judge qualitative synthesis, renders dynamic **Mermaid.js visualizations**, logs telemetry in DuckDB, and exports structured research notes directly into a local **Obsidian vault**.
 
 ### 💡 Project Origin & Personal Motivation
 While the concept of multi-LLM consensus (known in AI research as *Multi-Agent Debate (MAD)* or *Mixture-of-Agents (MoA)*) is an established architectural pattern, **AI Consilium was created out of two real-world motivations:**
 
 1. **Scratching My Own Itch:** I spent endless hours manually cross-validating code, architecture patterns, and technical decisions by copy-pasting questions across ChatGPT, Claude, and Gemini tabs back and forth. Managing scattered answers manually became unsustainable, making an automated multi-model consensus harness and local knowledge base finally inevitable.
-2. **Applying LLM Zoomcamp in Real Life:** I wanted to take the core engineering concepts learned throughout DataTalksClub's LLM Zoomcamp (RAG retrieval, vector search, evaluation metrics, telemetry, and LiteLLM integration) and synthesize them into a practical, production-grade tool for daily engineering workflows.
+2. **Applying LLM Zoomcamp in Real Life:** I wanted to take the core engineering concepts learned throughout DataTalksClub's LLM Zoomcamp (RAG retrieval, vector search, evaluation metrics, telemetry, and LiteLLM integration) and synthesize them into a practical tool for daily engineering workflows.
 
 ---
 
@@ -34,7 +34,7 @@ This project was built from the ground up to fulfill every requirement of the [D
 
 | Evaluation Criteria | Target Score | Detailed Justification & Implementation |
 | :--- | :--- | :--- |
-| **1. Problem Description** | **2 / 2 points** | Clear, high-stakes target audience (solopreneurs/founders) with specific pain points (eliminating single-LLM hallucination risk in legal, tax, and system architecture decisions). |
+| **1. Problem Description** | **2 / 2 points** | Clear, high-stakes target audience (solopreneurs/founders) with specific pain points (mitigating single-model hallucination risk in legal, tax, and system architecture decisions via multi-LLM cross-validation). |
 | **2. RAG Pipeline & Retrieval** | **6 / 6 points** | Uses embedded **DuckDB** for zero-dependency hybrid search combining **Dense Vector Search (`vss` extension)** and **Sparse Full-Text Search (`fts` extension)** over local Obsidian notes and reference docs. |
 | **3. RAG / LLM Evaluation** | **6 / 6 points** | Dual-layer evaluation: 1) **Quantitative Metric:** Pairwise cosine similarity matrix using `sentence-transformers` embeddings + Z-score outlier detection. 2) **Qualitative Metric:** LLM-as-a-Judge synthesis with fallback chain. 3) **Retrieval Evaluation:** Hit Rate & MRR benchmark script (`evaluate_retrieval.py`). |
 | **4. Monitoring & Observability** | **6 / 6 points** | Built-in DuckDB `query_logs` tracking query parameters, individual model latencies, token counts, estimated API costs, consensus scores, and **User Feedback (+1 / -1 thumbs ratings)**. |
@@ -47,9 +47,9 @@ This project was built from the ground up to fulfill every requirement of the [D
 
 ## ⭐ Unique Strengths & Innovations of AI Consilium
 
-AI Consilium goes beyond traditional single-model RAG question-answering systems by introducing a deterministic multi-model consensus harness:
+AI Consilium goes beyond traditional single-model RAG question-answering systems by introducing a multi-model consensus harness:
 
-- 🏛️ **Multi-LLM Consensus Engine:** Eliminates single-model hallucination risk by querying $N$ frontier LLM providers concurrently and computing an $N \times N$ pairwise cosine similarity matrix with Z-score outlier detection.
+- 🏛️ **Multi-LLM Consensus Engine:** Mitigates single-model hallucination risk by querying $N$ frontier LLM providers concurrently and computing an $N \times N$ pairwise cosine similarity matrix with Z-score outlier detection.
 - ⚖️ **LLM-as-a-Judge Qualitative Synthesis:** Merges disparate model responses into an executive summary highlighting unanimous agreement points, explicit contradiction audit logs, and dynamic Mermaid.js workflow diagrams with automatic judge fallback chains.
 - ⚡ **100% Free & Zero-Cost Developer Mode:** Features a 1-click fallback to 5 free models on OpenRouter (`:free`) and local CPU embeddings (`all-MiniLM-L6-v2`), requiring $0 API budget to test and run.
 - 📂 **Native Obsidian Vault Integration:** Exports structured `.md` research notes with YAML frontmatter, tags, agreement lists, and embedded Mermaid charts directly into local knowledge bases (`OBSIDIAN_VAULT_PATH`).
