@@ -7,6 +7,7 @@ Commands
 Rules
 
 - Dependencies are added in `pyproject.toml`. Do not add one without asking.
+- **Context7 MCP Verification Rule:** All coding agents MUST double-check library/framework syntax (LiteLLM model slugs, Streamlit UI parameters, DuckDB methods, Mermaid diagram syntax) using Context7 MCP server (`resolve-library-id`, `query-docs`) BEFORE implementing code changes to eliminate API deprecation and syntax bugs.
 
 Workflow & Dual-Review Pipeline
 
