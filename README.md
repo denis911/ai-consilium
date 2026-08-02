@@ -443,6 +443,18 @@ If you want to see **AI Consilium** in action and experience its practical value
 | **3. Offline Embedding Engine** | `"Compare local SentenceTransformers (all-MiniLM-L6-v2) vs OpenAI text-embedding-3-small for local CPU RAG cost and privacy"` | **SentenceTransformers:** $0 API fees, 384-d dense vectors, fast offline CPU inference (<50ms). |
 | **4. Note Export & Visualizations** | `"Compare Obsidian Markdown vault storage with Mermaid.js vs cloud Notion API for local-first knowledge bases"` | **Obsidian + Mermaid.js:** Clean Markdown with YAML frontmatter, zero vendor lock-in, dynamic chart rendering. |
 
+---
+
+## ⚠️ Legal & Usage Disclaimer
+
+> **For full terms, see [`DISCLAIMER.md`](file:///c:/tmp/ai-consilium/DISCLAIMER.md)**
+
+1. **Hobby Project / Personal Brainstorming Use Only:** AI Consilium is a non-commercial, personal hobby project created to assist with personal research productivity and brainstorming. Commercial or industrial deployment is prohibited.
+2. **Statistical Ensembling Tool (No Guarantee of Truth):** This software acts as a statistical ensembling and outlier detection harness over third-party LLM APIs. It does **not** guarantee objective truth beyond the probabilistic outputs of underlying models.
+3. **Complete Waiver of Liability:** The author and contributors waive all responsibility and liability for direct, indirect, financial, or consequential damages resulting from the use or misuse of this software. Users use this tool strictly at their own risk and agree not to seek financial compensation under any legal theory.
+4. **Prohibited High-Risk & Hazardous Uses:** Use in weapons systems, military operations, hazardous chemical processing, medical diagnosis, aviation, or technologies that could cause physical harm or loss of human life is strictly prohibited.
+5. **Not Financial, Legal, or Investment Advice:** This tool is **not** an investment advisor or stock trading engine and cannot evaluate financial instruments. Outputs do not constitute licensed legal, accounting, tax, or financial counsel.
+
 ### 🧪 Try it in CLI mode right now:
 ```bash
 uv run python main.py --query "Compare embedded DuckDB (VSS + FTS) vs PostgreSQL (pgvector) for zero-dependency local desktop RAG search" --free-tier --export
