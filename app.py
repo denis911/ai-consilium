@@ -142,7 +142,7 @@ def main():
 
         col_run, col_clear = st.columns([1, 5])
         with col_run:
-            run_button = st.button("🚀 Run Consilium Engine", type="primary", use_container_width=True)
+            run_button = st.button("🚀 Run Consilium Engine", type="primary", width="stretch")
 
         if run_button and user_query.strip():
             with st.status("🏛️ Executing Consilium Multi-Model Consensus Engine...", expanded=True) as status:
@@ -221,7 +221,7 @@ def main():
 
             with col_vault:
                 exporter = ObsidianExporter()
-                if st.button("📥 Export Note to Obsidian Vault", type="secondary", use_container_width=True):
+                if st.button("📥 Export Note to Obsidian Vault", type="secondary", width="stretch"):
                     saved_path = exporter.export_artifact(artifact, vault_path=vault_path)
                     st.success(f"✅ Note exported to: `{saved_path}`")
 
@@ -229,12 +229,12 @@ def main():
             st.markdown("**Rate this consensus brief:**")
             fb_col1, fb_col2, _ = st.columns([1, 1, 4])
             with fb_col1:
-                if st.button("👍 Accurate", key="btn_pos", use_container_width=True):
+                if st.button("👍 Accurate", key="btn_pos", width="stretch"):
                     if "latest_run_id" in st.session_state:
                         telemetry.update_user_feedback(st.session_state["latest_run_id"], rating=1)
                         st.success("Feedback recorded! 👍")
             with fb_col2:
-                if st.button("👎 Contradictory", key="btn_neg", use_container_width=True):
+                if st.button("👎 Contradictory", key="btn_neg", width="stretch"):
                     if "latest_run_id" in st.session_state:
                         telemetry.update_user_feedback(st.session_state["latest_run_id"], rating=-1)
                         st.warning("Feedback recorded! 👎")
@@ -295,7 +295,7 @@ def main():
         history = telemetry.get_audit_history(limit=50)
 
         if history:
-            st.dataframe(history, use_container_width=True)
+            st.dataframe(history, width="stretch")
         else:
             st.info("No query logs recorded in DuckDB yet. Run a query in Tab 1 to generate telemetry.")
 
