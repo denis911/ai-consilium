@@ -99,7 +99,13 @@ AI Consilium supports two flexible execution paradigms depending on whether you 
 ### 🔥 Warm Start Mode (Existing Obsidian Vault / Folder Full of Notes)
 - **What it is:** Ideal when you already have an existing Obsidian vault or a directory full of Markdown notes.
 - **How it works:** You can safely point `OBSIDIAN_VAULT_PATH` to your existing vault. Running the ingestion script (`uv run python ingest.py --dir C:/ai-memory/ai-concilium`) recursively scans `.md` files, parses YAML tags and headings, computes 384-d dense embeddings (`all-MiniLM-L6-v2`), and indexes them into DuckDB (`ai_consilium.duckdb`).
-- **Result:** New consensus research queries are automatically grounded in your past research notes and documentation via hybrid dense vector (`vss`) and sparse keyword (`fts`) search!
+### 💡 Pre-Fetch ASCII & Markdown Summarization Pattern (Cost & Consensus Integrity)
+
+When researching high-stakes topics involving complex PDFs, contracts, financial statements, or screenshots, AI Consilium recommends the **Pre-Fetch ASCII & Markdown Summarization Pattern**:
+
+1. **Zero-Cost Document Pre-Processing:** Rather than burning multi-modal vision API tokens across 5 separate frontier models simultaneously, users can paste complex PDFs or screenshots into standalone chat interfaces (ChatGPT, Claude, or Gemini web apps) and ask: *"Summarize this document into plain text, Markdown tables, and ASCII diagrams."*
+2. **100% Context Uniformity & Mathematical Validity:** Copy-pasting the resulting clean Markdown summary into AI Consilium's RAG context box guarantees that all 5 consensus models receive **100% identical inputs**. This eliminates representation asymmetry (where vision models see visual layouts while text models receive raw OCR text), ensuring that inter-model embedding similarity scores and Z-score outlier calculations remain strictly mathematical, unbiased, and meaningful.
+3. **Significant API Cost Savings:** Avoids multiplying heavy multi-modal image/document payload fees across $N$ providers in parallel, keeping multi-model consensus research under **$0.02 – $0.05 per run**.
 
 ---
 
