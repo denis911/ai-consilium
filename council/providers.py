@@ -150,13 +150,17 @@ class LLMProviderEngine:
                         "X-Title": "AI Consilium Dual-Engine Consensus Agent",
                     })
                     call_kwargs["extra_headers"] = headers
-                    if timeout_val and timeout_val > 0:
-                        response = await asyncio.wait_for(
-                            litellm.acompletion(**call_kwargs),
-                            timeout=timeout_val,
-                        )
-                    else:
-                        response = await litellm.acompletion(**call_kwargs)
+                    try:
+                        if timeout_val and timeout_val > 0:
+                            response = await asyncio.wait_for(
+                                litellm.acompletion(**call_kwargs),
+                                timeout=timeout_val,
+                            )
+                        else:
+                            response = await litellm.acompletion(**call_kwargs)
+                    except Exception as fallback_err:
+                        logger.warning(f"OpenRouter fallback for {model_name} failed ({fallback_err}). Re-raising direct error.")
+                        raise direct_err
                 else:
                     raise direct_err
 

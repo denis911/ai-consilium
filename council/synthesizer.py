@@ -28,22 +28,37 @@ JUDGE_FALLBACK_CHAIN = [
 
 
 def _sanitize_mermaid_code(code: str) -> str:
-    """Sanitize invalid Mermaid syntax (such as 'A & B --> C')."""
+    """Sanitize invalid Mermaid syntax (such as 'A -- Text --> B', unquoted parens, or 'A & B --> C')."""
     if not code:
         return ""
     cleaned = code.replace("```mermaid", "").replace("```", "").strip()
     lines = cleaned.split("\n")
     cleaned_lines = []
     for line in lines:
-        if " & " in line and "-->" in line:
-            parts = line.split("-->")
+        l = line
+        # Fix 'A -- Text --> B' pattern to valid 'A -->|Text| B'
+        l = re.sub(r'(\b\w+)\s+--\s+([^\-\>]+)\s+-->\s+(\b\w+)', r'\1 -->|\2| \3', l)
+
+        # Fix 'Node(Label containing parens or colons)' pattern to 'Node["Label"]'
+        def fix_node_parens(m):
+            node_id = m.group(1)
+            content = m.group(2).strip()
+            if content.startswith("(") and content.endswith(")"):
+                content = content[1:-1]
+            return f'{node_id}["{content}"]'
+
+        l = re.sub(r'(\b[A-Za-z0-9_]+)\(([^)]*[\(\:\-][^)]*)\)', fix_node_parens, l)
+
+        # Fix 'NodeA & NodeB --> NodeC' pattern
+        if " & " in l and "-->" in l:
+            parts = l.split("-->")
             if len(parts) == 2:
                 left, right = parts[0].strip(), parts[1].strip()
                 left_nodes = [n.strip() for n in left.split("&")]
                 for node in left_nodes:
                     cleaned_lines.append(f"  {node} --> {right}")
                 continue
-        cleaned_lines.append(line)
+        cleaned_lines.append(l)
     return "\n".join(cleaned_lines)
 
 
@@ -81,7 +96,7 @@ class LLMJudgeSynthesizer:
             '  "contradictions": [\n'
             '    {"topic": "topic name", "description": "why they contradict", "conflicting_models": ["model1", "model2"]}\n'
             "  ],\n"
-            '  "mermaid_code": "graph TD\\n  A[Topic] --> B[Consensus]",\n'
+            '  "mermaid_code": "flowchart TD\\n  A[Topic] --> B[Consensus]",\n'
             '  "obsidian_title": "2026-07-25-topic-name",\n'
             '  "tags": ["tag1", "tag2"]\n'
             "}"
@@ -112,7 +127,7 @@ class LLMJudgeSynthesizer:
             "Return a single JSON object with the following exact keys:\n"
             "- \"agreement_points\": list of strings summarizing key points of unanimous consensus\n"
             "- \"contradictions\": list of objects with {\"topic\": string, \"description\": string, \"conflicting_models\": list of strings}\n"
-            "- \"mermaid_code\": valid Mermaid.js diagram code visualizing the workflow or trade-offs (DO NOT use 'A & B --> C' syntax)\n"
+            "- \"mermaid_code\": valid Mermaid.js flowchart code visualizing workflow/trade-offs. MUST follow rules: 1. Start with 'flowchart TD'. 2. Wrap node text in double quotes like A[\"Text (here)\"]. 3. Use A -->|Label| B for labeled arrows.\n"
             "- \"obsidian_title\": recommended note title string (kebab-case)\n"
             "- \"tags\": list of 3-5 relevance tags\n"
         )
