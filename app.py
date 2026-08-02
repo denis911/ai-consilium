@@ -130,6 +130,7 @@ def main():
         )
 
         with st.expander("📚 Optional Reference Context (RAG Ingestion)"):
+            st.caption("💡 **Pro-Tip (Pre-Fetch Summarization):** For PDFs, images, or screenshots, ask ChatGPT or Claude to summarize them into Markdown/plain text first, then paste here. This ensures all 5 consensus models receive 100% identical, balanced inputs!")
             rag_context_input = st.text_area(
                 "Paste local reference notes or document snippets to ground the query:",
                 height=120,
