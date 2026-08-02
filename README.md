@@ -103,9 +103,21 @@ AI Consilium supports two flexible execution paradigms depending on whether you 
 
 When researching high-stakes topics involving complex PDFs, contracts, financial statements, or screenshots, AI Consilium recommends the **Pre-Fetch ASCII & Markdown Summarization Pattern**:
 
-1. **Zero-Cost Document Pre-Processing:** Rather than burning multi-modal vision API tokens across 5 separate frontier models simultaneously, users can paste complex PDFs or screenshots into standalone chat interfaces (ChatGPT, Claude, or Gemini web apps) and ask: *"Summarize this document into plain text, Markdown tables, and ASCII diagrams."*
+1. **Zero-Cost Document Pre-Processing:** Rather than burning multi-modal vision API tokens across 5 separate frontier models simultaneously, users can paste complex PDFs or screenshots into standalone chat interfaces (ChatGPT, Claude, or Gemini web apps) for $0.
 2. **100% Context Uniformity & Mathematical Validity:** Copy-pasting the resulting clean Markdown summary into AI Consilium's RAG context box guarantees that all 5 consensus models receive **100% identical inputs**. This eliminates representation asymmetry (where vision models see visual layouts while text models receive raw OCR text), ensuring that inter-model embedding similarity scores and Z-score outlier calculations remain strictly mathematical, unbiased, and meaningful.
-3. **Significant API Cost Savings:** Avoids multiplying heavy multi-modal image/document payload fees across $N$ providers in parallel, keeping multi-model consensus research under **$0.02 – $0.05 per run**.
+3. **Optimal Context Window Size:** While frontier models support 128k–1M token context windows, the optimal range for fast multi-model consensus latency (<3s) and cost (<$0.03/query) is **500 to 2,500 words (~3,000 to 15,000 characters / ~1k–4k tokens)**.
+4. **Significant API Cost Savings:** Avoids multiplying heavy multi-modal image/document payload fees across $N$ providers in parallel, keeping multi-model consensus research under **$0.02 – $0.05 per run**.
+
+#### 📋 Recommended Copy-Paste Pre-Fetch Prompt Template:
+> Copy and paste this prompt into ChatGPT, Claude, or Gemini when uploading a PDF or screenshot:
+```text
+Please analyze and summarize the attached document [PDF / Screenshot / File] for high-stakes decision-making. 
+Output a structured Markdown summary containing:
+1) Core Technical, Legal, or Financial Facts & Constraints
+2) Key Numerical Values, Data Points, or Tables
+3) Potential Risks, Edge Cases, or Unclear Points
+Keep the summary concise (between 500 and 1,500 words) using plain text, Markdown tables, and ASCII diagrams.
+```
 
 ---
 
