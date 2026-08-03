@@ -121,6 +121,7 @@ def main():
     st.sidebar.info(f"📂 **Obsidian Vault:**\n`{vault_path}`")
 
     use_free_tier = st.sidebar.toggle("⚡ OpenRouter $0 Free Model Tier", value=False)
+    use_rag = st.sidebar.toggle("🧠 Enable Vault RAG Grounding", value=True)
 
     if use_free_tier:
         st.sidebar.caption("Routing queries to 5 free models on OpenRouter. ℹ️ *Free-tier models have rate limits; switch to frontier models for high-stakes decisions.*")
@@ -128,6 +129,11 @@ def main():
     else:
         st.sidebar.caption("Querying frontier LLM APIs in parallel.")
         selected_models = DEFAULT_MODELS
+
+    if use_rag:
+        st.sidebar.caption("📚 Vault RAG enabled: Grounding queries with matching notes from `ai_consilium.duckdb`.")
+    else:
+        st.sidebar.caption("🌐 Vault RAG disabled: Querying LLM panel purely on pre-trained parametric knowledge.")
 
     st.sidebar.markdown("---")
     st.sidebar.subheader("🔑 Active API Keys")
@@ -175,15 +181,16 @@ def main():
                 status.update(label="1/4 📚 Searching vault RAG database & reference context...", state="running")
                 context_chunks = []
 
-                # Query persistent DuckDB vault database
-                try:
-                    persistent_rag = DuckDBRAGEngine(db_path="ai_consilium.duckdb", shared_model=consensus_engine.model)
-                    vault_results = persistent_rag.search(user_query, top_k=3)
-                    for r in vault_results:
-                        context_chunks.append(f"[Vault Note: {r['title']}]\n{r['content']}")
-                    persistent_rag.close()
-                except Exception as rag_err:
-                    logger.warning(f"Vault RAG search warning: {rag_err}")
+                # Query persistent DuckDB vault database if RAG toggle is enabled
+                if use_rag:
+                    try:
+                        persistent_rag = DuckDBRAGEngine(db_path="ai_consilium.duckdb", shared_model=consensus_engine.model)
+                        vault_results = persistent_rag.search(user_query, top_k=3)
+                        for r in vault_results:
+                            context_chunks.append(f"[Vault Note: {r['title']}]\n{r['content']}")
+                        persistent_rag.close()
+                    except Exception as rag_err:
+                        logger.warning(f"Vault RAG search warning: {rag_err}")
 
                 # Combine with optional manually pasted text
                 if rag_context_input.strip():
