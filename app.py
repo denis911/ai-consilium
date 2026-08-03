@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 
 from council.schemas import ConsiliumQueryInput
 from council.providers import LLMProviderEngine, DEFAULT_MODELS, OPENROUTER_FREE_MODELS
-from council.rag import DuckDBRAGEngine
+from council.rag import DuckDBRAGEngine, collect_rag_chunks
 from council.consensus import ConsensusEngine
 from council.synthesizer import LLMJudgeSynthesizer
 from council.exporter import ObsidianExporter
@@ -186,43 +186,20 @@ def main():
                     try:
                         persistent_rag = DuckDBRAGEngine(db_path="ai_consilium.duckdb", shared_model=consensus_engine.model)
                         vault_results = persistent_rag.search(user_query, top_k=3)
-                        total_char_budget = 10000
-                        current_chars = 0
-
-                        for r in vault_results:
-                            snippet_title = r['title']
-                            snippet_content = r['content'].strip()
-                            
-                            # Strip Mermaid code & raw provider response blocks to maximize consensus density
-                            if "## 📊 Consensus Architecture" in snippet_content:
-                                snippet_content = snippet_content.split("## 📊 Consensus Architecture")[0].strip()
-                            elif "## 🔍 Multi-Model Raw Provider Responses" in snippet_content:
-                                snippet_content = snippet_content.split("## 🔍 Multi-Model Raw Provider Responses")[0].strip()
-
-                            formatted_chunk = f"[Vault Note: {snippet_title}]\n{snippet_content}"
-                            
-                            if current_chars + len(formatted_chunk) > total_char_budget:
-                                remaining_budget = total_char_budget - current_chars
-                                if remaining_budget > 100:
-                                    truncated_content = snippet_content[:remaining_budget - 50] + "... [Truncated for Context Budget]"
-                                    context_chunks.append(f"[Vault Note: {snippet_title}]\n{truncated_content}")
-                                break
-                            else:
-                                context_chunks.append(formatted_chunk)
-                                current_chars += len(formatted_chunk)
+                        context_chunks.extend(collect_rag_chunks(vault_results, total_char_budget=10000))
                         persistent_rag.close()
                     except Exception as rag_err:
                         logger.warning(f"Vault RAG search warning: {rag_err}")
 
-                # Combine with optional manually pasted text
+                # Combine with optional manually pasted text (enforcing budget ceiling)
                 if rag_context_input.strip():
                     rag_engine = DuckDBRAGEngine(db_path=":memory:", shared_model=consensus_engine.model)
                     rag_engine.ingest_documents([
                         {"id": "doc1", "title": "Manual Context", "content": rag_context_input.strip()}
                     ])
                     results = rag_engine.search(user_query, top_k=3)
-                    for r in results:
-                        context_chunks.append(r["content"])
+                    manual_chunks = collect_rag_chunks(results, total_char_budget=10000)
+                    context_chunks.extend(manual_chunks)
                     rag_engine.close()
 
                 query_input = ConsiliumQueryInput(

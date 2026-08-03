@@ -164,3 +164,38 @@ class DuckDBRAGEngine:
     def close(self) -> None:
         """Close database connection."""
         self.conn.close()
+
+
+SECTION_STRIP_MARKERS = [
+    "## 📊 Consensus Architecture",
+    "## 🔍 Multi-Model Raw Provider Responses",
+]
+
+
+def collect_rag_chunks(vault_results: List[Dict[str, Any]], total_char_budget: int = 10000) -> List[str]:
+    """Apply section stripping and cumulative character budget cap to RAG search results."""
+    context_chunks = []
+    current_chars = 0
+
+    for r in vault_results:
+        snippet_title = r.get("title", "Reference Note")
+        snippet_content = str(r.get("content", "")).strip()
+
+        # Strip non-essential Mermaid code & raw provider response blocks to maximize consensus density
+        for marker in SECTION_STRIP_MARKERS:
+            if marker in snippet_content:
+                snippet_content = snippet_content.split(marker)[0].strip()
+
+        formatted_chunk = f"[Vault Note: {snippet_title}]\n{snippet_content}"
+
+        if current_chars + len(formatted_chunk) > total_char_budget:
+            remaining_budget = total_char_budget - current_chars
+            if remaining_budget > 100:
+                truncated_content = snippet_content[:remaining_budget - 50] + "... [Truncated for Context Budget]"
+                context_chunks.append(f"[Vault Note: {snippet_title}]\n{truncated_content}")
+            break
+        else:
+            context_chunks.append(formatted_chunk)
+            current_chars += len(formatted_chunk)
+
+    return context_chunks

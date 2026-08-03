@@ -75,7 +75,8 @@ class DuckDBTelemetryLogger:
 
         num_contradictions = len(artifact.contradictions) if artifact.contradictions else 0
 
-        self.conn.execute(
+        cursor = self.conn.cursor()
+        cursor.execute(
             """
             INSERT INTO query_logs (
                 run_id, timestamp, query, consensus_score, num_models,
@@ -99,13 +100,15 @@ class DuckDBTelemetryLogger:
                 num_contradictions,
             ),
         )
+        cursor.close()
 
         logger.info(f"Logged query execution run {run_id} to DuckDB query_logs.")
         return run_id
 
     def update_user_feedback(self, run_id: str, rating: int, comment: str = "") -> None:
         """Update user rating (+1 / -1) and optional comment for a run."""
-        self.conn.execute(
+        cursor = self.conn.cursor()
+        cursor.execute(
             """
             UPDATE query_logs
             SET user_rating = ?, user_feedback_comment = ?
@@ -113,11 +116,13 @@ class DuckDBTelemetryLogger:
             """,
             (rating, comment, run_id),
         )
+        cursor.close()
         logger.info(f"Updated user feedback for run {run_id}: rating={rating}")
 
     def get_audit_history(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Retrieve historical query execution logs ordered by timestamp descending."""
-        res = self.conn.execute(
+        cursor = self.conn.cursor()
+        res = cursor.execute(
             """
             SELECT run_id, timestamp, query, consensus_score, num_models,
                    total_tokens, total_cost_usd, avg_latency_ms, model_latencies, num_contradictions,
@@ -128,6 +133,7 @@ class DuckDBTelemetryLogger:
             """,
             (limit,),
         ).fetchall()
+        cursor.close()
 
         history = []
         for run_id, ts, q, score, num_m, tokens, cost, latency, latencies_json, contradictions, rating, comment in res:
@@ -149,7 +155,8 @@ class DuckDBTelemetryLogger:
 
     def get_telemetry_summary(self) -> Dict[str, Any]:
         """Aggregate total queries, average consensus score, tokens, cost, latency, and satisfaction rate."""
-        res = self.conn.execute(
+        cursor = self.conn.cursor()
+        res = cursor.execute(
             """
             SELECT COUNT(*),
                    COALESCE(AVG(consensus_score), 0.0),
@@ -161,6 +168,7 @@ class DuckDBTelemetryLogger:
             FROM query_logs
             """
         ).fetchone()
+        cursor.close()
 
         total_queries, avg_score, total_tokens, total_cost, avg_latency, pos_ratings, total_rated = res
         satisfaction_rate = round((pos_ratings / total_rated) * 100.0, 1) if total_rated > 0 else 100.0
