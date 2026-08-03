@@ -35,13 +35,13 @@ DEFAULT_MODELS: List[str] = [
     MODEL_DEEPSEEK,
 ]
 
-# OpenRouter 100% free model tier fallback identifiers (Active 2026 Free Tier)
+# OpenRouter 100% free model tier fallback identifiers (Verified Active 2026 Free Tier)
 OPENROUTER_FREE_MODELS: List[str] = [
-    "openrouter/deepseek/deepseek-r1:free",
-    "openrouter/nvidia/nemotron-3-ultra:free",
-    "openrouter/google/gemma-4-26b-a4b:free",
     "openrouter/inclusionai/ling-3.0-flash:free",
-    "openrouter/meta-llama/llama-3.2-11b-vision-instruct:free",
+    "openrouter/google/gemma-4-26b-a4b-it:free",
+    "openrouter/nvidia/nemotron-3-nano-30b-a3b:free",
+    "openrouter/poolside/laguna-s-2.1:free",
+    "openrouter/cohere/north-mini-code:free",
 ]
 
 PRIMARY_PROVIDER_KEYS: List[str] = [
