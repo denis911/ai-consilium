@@ -7,7 +7,16 @@ Commands
 Rules
 
 - Dependencies are added in `pyproject.toml`. Do not add one without asking.
-- **Context7 MCP Verification Rule:** All coding agents MUST double-check library/framework syntax (LiteLLM model slugs, Streamlit UI parameters, DuckDB methods, Mermaid diagram syntax) using Context7 MCP server (`resolve-library-id`, `query-docs`) BEFORE implementing code changes to eliminate API deprecation and syntax bugs.
+- **Context7 MCP Verification Rule:** All coding agents MUST double-check library/framework syntax (LiteLLM model slugs, Streamlit UI parameters, DuckDB methods, Mermaid diagram syntax) using Context7 MCP server (`resolve-library-id`, `query-docs`) or direct API `/v1/models` endpoints BEFORE implementing code changes to eliminate API deprecation and syntax bugs.
+- **Streamlit UI Best Practices:**
+  - Use `width="stretch"` for full-width buttons and widgets (never use deprecated `use_container_width`).
+  - Use `st.html(html_code)` for inline HTML/JS components (never use deprecated `st.components.v1.html`).
+  - Silence harmless Pydantic serialization warnings via `warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")`.
+- **Mermaid Diagram Sanitization:**
+  - Enforce `flowchart TD` top-to-bottom layout with concise 5-8 word nodes.
+  - Wrap decision node text containing parens or special characters in quotes (`C{"Label (parens)?"}`).
+  - Convert arrow labels to standard `A -->|Text| B` format.
+  - Strip hallucinated `Unsupported markdown: list` text.
 
 Workflow & Dual-Review Pipeline
 
@@ -18,8 +27,8 @@ Workflow & Dual-Review Pipeline
    - Reviewers inspect the codebase while ignoring non-source noise (`uv.lock`, binary databases `*.duckdb`, `.pytest_cache`, `__pycache__`).
    - Every reviewer report MUST start with a standardized YAML frontmatter header (`risk_score: 1-5`, `breaking_changes: true|false`, `effort_estimate: low|medium|high`).
    - **Claude 3.5 Sonnet (`review/claude-review.md`):** Focuses on *Structural Integrity, Modular Architecture, Security Vulnerability Bounds (Path Traversal, Prompt/SQL Injections via SonarCloud MCP `denis911_ai-consilium`), Documentation, & Test-Coverage Rigor*. Results saved to `review/YYYY-MM-DD-code-review-Claude-N.md`.
-   - **Google Jules (`review/jules-review.md`):** Triggered via `[jules]` tagged issue. Focuses on *Native Idiomatic Code Alignment, DuckDB/LiteLLM Framework Optimizations, Async Concurrency, Boundary/Type Safety, & Algorithmic Performance* without Sonar MCP dependency. Results saved to `review/YYYY-MM-DD-code-review-jules-N.md`.
-4. **Risk-Based Grooming & Consensus Rule:**
-   - **High-Priority Critical Items:** Any flaw with `risk_score >= 3` or flagged by **both reviewers** is groomed into a high-priority GitHub issue.
-   - **Lower-Priority Quality Refinements:** Single-reviewer nitpicks or low risk items (`risk_score < 3`) are groomed as lower-priority tasks.
-5. **PR Merge & Execution:** Merge Jules' PR via `gh pr merge <PR_NUM> --merge`, pull `main` locally, groom consensus findings into new GitHub issues, and proceed with coding.
+   - **Google Jules (`review/jules-review.md`):** Triggered by creating a GitHub issue tagged `[jules]` (`gh issue create --title "[jules] Code Review Request..." --body "..."`). Google Jules (cloud agent) performs the code review independently and submits a GitHub Pull Request (PR) containing `review/YYYY-MM-DD-code-review-jules-N.md`.
+4. **PR Merge & Execution Phase:**
+   - Coding agent merges Jules' PR via `gh pr merge <PR_NUM> --merge` (or `--squash`).
+   - Coding agent pulls `main` locally (`git pull origin main`).
+   - Coding agent reads and discusses the review report with the user, grooming any critical findings (`risk_score >= 3`) into new high-priority GitHub issues before proceeding.
