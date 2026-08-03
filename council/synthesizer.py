@@ -267,6 +267,7 @@ class LLMJudgeSynthesizer:
                     obsidian_title=str(parsed.get("obsidian_title", "consensus-research")),
                     tags=list(parsed.get("tags", ["consensus", "research"])),
                     responses=responses,
+                    context_chunks=query_input.context_chunks,
                 )
             except Exception as e:
                 logger.warning(f"Synthesis failed with judge model {model}: {e}. Trying fallback...")
@@ -291,4 +292,5 @@ class LLMJudgeSynthesizer:
             obsidian_title="consensus-research-fallback",
             tags=["consensus", "fallback"],
             responses=responses,
+            context_chunks=query_input.context_chunks,
         )

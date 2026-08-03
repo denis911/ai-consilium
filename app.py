@@ -267,9 +267,10 @@ def main():
                     st.success(f"✅ Note exported to: `{saved_path}`")
 
             # Grounded RAG Reference Context Display
-            if artifact.context_chunks:
-                with st.expander(f"📚 Grounded RAG Reference Context ({len(artifact.context_chunks)} notes retrieved from vault)"):
-                    for idx, chunk in enumerate(artifact.context_chunks, 1):
+            context_chunks = getattr(artifact, "context_chunks", [])
+            if context_chunks:
+                with st.expander(f"📚 Grounded RAG Reference Context ({len(context_chunks)} notes retrieved from vault)"):
+                    for idx, chunk in enumerate(context_chunks, 1):
                         st.markdown(f"**Snippet {idx}:**")
                         st.code(chunk, language="text")
 

@@ -60,3 +60,4 @@ class ConsiliumFinalArtifact(BaseModel):
     obsidian_title: str = Field(default="", description="Recommended human-readable note title")
     tags: List[str] = Field(default_factory=list, description="Categorization tags for Obsidian metadata")
     responses: List[ModelResponsePayload] = Field(default_factory=list, description="Individual model responses")
+    context_chunks: List[str] = Field(default_factory=list, description="RAG reference context snippets used to ground query")
