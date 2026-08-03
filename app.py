@@ -186,8 +186,22 @@ def main():
                     try:
                         persistent_rag = DuckDBRAGEngine(db_path="ai_consilium.duckdb", shared_model=consensus_engine.model)
                         vault_results = persistent_rag.search(user_query, top_k=3)
+                        total_char_budget = 3000
+                        current_chars = 0
                         for r in vault_results:
-                            context_chunks.append(f"[Vault Note: {r['title']}]\n{r['content']}")
+                            snippet_title = r['title']
+                            snippet_content = r['content'].strip()
+                            formatted_chunk = f"[Vault Note: {snippet_title}]\n{snippet_content}"
+                            
+                            if current_chars + len(formatted_chunk) > total_char_budget:
+                                remaining_budget = total_char_budget - current_chars
+                                if remaining_budget > 100:
+                                    truncated_content = snippet_content[:remaining_budget - 50] + "... [Truncated for Context Budget]"
+                                    context_chunks.append(f"[Vault Note: {snippet_title}]\n{truncated_content}")
+                                break
+                            else:
+                                context_chunks.append(formatted_chunk)
+                                current_chars += len(formatted_chunk)
                         persistent_rag.close()
                     except Exception as rag_err:
                         logger.warning(f"Vault RAG search warning: {rag_err}")

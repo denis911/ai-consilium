@@ -78,8 +78,21 @@ async def run_cli(args_parsed):
             from council.rag import DuckDBRAGEngine
             rag_engine = DuckDBRAGEngine(db_path="ai_consilium.duckdb")
             vault_results = rag_engine.search(query_text, top_k=3)
+            total_char_budget = 3000
+            current_chars = 0
             for r in vault_results:
-                context_chunks.append(f"[Vault Note: {r['title']}]\n{r['content']}")
+                snippet_title = r['title']
+                snippet_content = r['content'].strip()
+                formatted_chunk = f"[Vault Note: {snippet_title}]\n{snippet_content}"
+                if current_chars + len(formatted_chunk) > total_char_budget:
+                    remaining_budget = total_char_budget - current_chars
+                    if remaining_budget > 100:
+                        truncated_content = snippet_content[:remaining_budget - 50] + "... [Truncated for Context Budget]"
+                        context_chunks.append(f"[Vault Note: {snippet_title}]\n{truncated_content}")
+                    break
+                else:
+                    context_chunks.append(formatted_chunk)
+                    current_chars += len(formatted_chunk)
             rag_engine.close()
         except Exception as e:
             logger.warning(f"CLI RAG retrieval warning: {e}")

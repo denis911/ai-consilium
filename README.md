@@ -378,6 +378,11 @@ AI Consilium implements a **Knowledge Flywheel**:
 > [!TIP]
 > **Cold Start Default & Safety:** "Enable Vault RAG Grounding" (and the CLI `--rag` flag) is **OFF by default** so new users start clean. If toggled **ON** before running `ingest.py`, DuckDB safely returns 0 matching results without errors or prompt pollution. Toggle it **ON** once you have run `ingest.py` to unlock historical RAG grounding!
 
+> [!IMPORTANT]
+> **RAG Context Budgeting & Cost Savings:**
+> - To prevent large Obsidian files (e.g. 20–40 KB notes) from overwhelming LLM prompt windows, AI Consilium enforces a strict cumulative **3,000 character cap (~500–750 tokens)** across all retrieved RAG snippets per query.
+> - **Best Practice:** Keep your Obsidian notes concise (under 1,000–2,000 characters / ~300 words) for maximum retrieval precision. If your vault contains multi-megabyte documents, leave Vault RAG **OFF** for standard queries to conserve API costs.
+
 ---
 
 ### 4. RAG Retrieval Evaluation Benchmark (`evaluate_retrieval.py`)
