@@ -30,10 +30,8 @@ JUDGE_FALLBACK_CHAIN = [
 def _fix_decision_node(m: re.Match) -> str:
     """Fix decision nodes with unquoted text containing parens or special chars: C{Text (parens)?} -> C{"Text (parens)?"}"""
     node_id = m.group(1)
-    content = m.group(2).strip()
-    if not (content.startswith('"') and content.endswith('"')):
-        content = f'"{content}"'
-    return f'{node_id}{{{content}}}'
+    content = m.group(2).strip().replace('"', '')
+    return f'{node_id}{{"{content}"}}'
 
 
 def _fix_node_parens(m: re.Match) -> str:
@@ -42,9 +40,8 @@ def _fix_node_parens(m: re.Match) -> str:
     content = m.group(2).strip()
     if content.startswith("(") and content.endswith(")"):
         content = content[1:-1]
-    if not (content.startswith('"') and content.endswith('"')):
-        content = f'"{content}"'
-    return f'{node_id}[{content}]'
+    content = content.replace('"', '')
+    return f'{node_id}["{content}"]'
 
 
 def _expand_and_nodes(line: str) -> Optional[List[str]]:
@@ -61,10 +58,8 @@ def _expand_and_nodes(line: str) -> Optional[List[str]]:
 def _fix_square_bracket_node(m: re.Match) -> str:
     """Fix square bracket nodes containing parens or special chars: D[Text (parens)] -> D["Text (parens)"]"""
     node_id = m.group(1)
-    content = m.group(2).strip()
-    if not (content.startswith('"') and content.endswith('"')):
-        content = f'"{content}"'
-    return f'{node_id}[{content}]'
+    content = m.group(2).strip().replace('"', '')
+    return f'{node_id}["{content}"]'
 
 
 def _sanitize_mermaid_code(code: str) -> str:
