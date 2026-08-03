@@ -362,12 +362,18 @@ uv run python main.py --query "Compare PostgreSQL vs DuckDB" --json
 
 ---
 
-### 3. Bulk Obsidian Vault Ingestion CLI (`ingest.py`)
-Bulk-scan and index an existing folder of Markdown notes into DuckDB RAG for "Warm Start" grounded search:
+### 3. Knowledge Flywheel: Ingesting Notes & Enabling Vault RAG (`ingest.py`)
 
-```bash
-uv run python ingest.py --dir C:/ai-memory/ai-concilium
-```
+AI Consilium implements a **Knowledge Flywheel**:
+1. **Cold Start:** Perform research queries. Click **"📥 Export Note to Obsidian Vault"** to accumulate Markdown consensus notes in your local vault directory (`C:/ai-memory/ai-concilium`).
+2. **Bulk Ingestion:** Once you have accumulated notes, ingest them into your persistent DuckDB vector database:
+   ```bash
+   uv run python ingest.py --dir C:/ai-memory/ai-concilium
+   ```
+3. **Hot Start (RAG Grounding):** In the Streamlit sidebar under **Engine Settings**, toggle **"🧠 Enable Vault RAG Grounding"** to **ON**. Future queries will automatically retrieve past consensus notes from `ai_consilium.duckdb` and ground the LLM panel!
+
+> [!TIP]
+> **Cold Start Default:** "Enable Vault RAG Grounding" is **OFF by default** so new users start clean without empty database warnings. Toggle it **ON** once you have run `ingest.py` to unlock historical RAG grounding!
 
 ---
 

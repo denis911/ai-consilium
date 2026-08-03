@@ -121,7 +121,7 @@ def main():
     st.sidebar.info(f"📂 **Obsidian Vault:**\n`{vault_path}`")
 
     use_free_tier = st.sidebar.toggle("⚡ OpenRouter $0 Free Model Tier", value=False)
-    use_rag = st.sidebar.toggle("🧠 Enable Vault RAG Grounding", value=True)
+    use_rag = st.sidebar.toggle("🧠 Enable Vault RAG Grounding", value=False)
 
     if use_free_tier:
         st.sidebar.caption("Routing queries to 5 free models on OpenRouter. ℹ️ *Free-tier models have rate limits; switch to frontier models for high-stakes decisions.*")
