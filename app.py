@@ -88,14 +88,16 @@ import html as html_lib
 
 def render_mermaid_diagram(mermaid_code: str):
     """Render a responsive Mermaid diagram with auto-fit styling using Streamlit native st.html."""
-    safe_code = html_lib.escape(mermaid_code)
     html_code = f"""
     <div class="mermaid" style="width: 100%; max-width: 100%; text-align: center; overflow-x: auto;">
-      {safe_code}
+{mermaid_code}
     </div>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>
-      mermaid.initialize({{ startOnLoad: true, theme: 'dark', flowchart: {{ useMaxWidth: true, htmlLabels: true }} }});
+      if (window.mermaid) {{
+        window.mermaid.initialize({{ startOnLoad: false, theme: 'dark', flowchart: {{ useMaxWidth: true, htmlLabels: true }} }});
+        window.mermaid.run();
+      }}
     </script>
     """
     st.html(html_code)

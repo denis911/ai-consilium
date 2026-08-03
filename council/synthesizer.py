@@ -58,6 +58,15 @@ def _expand_and_nodes(line: str) -> Optional[List[str]]:
     return None
 
 
+def _fix_square_bracket_node(m: re.Match) -> str:
+    """Fix square bracket nodes containing parens or special chars: D[Text (parens)] -> D["Text (parens)"]"""
+    node_id = m.group(1)
+    content = m.group(2).strip()
+    if not (content.startswith('"') and content.endswith('"')):
+        content = f'"{content}"'
+    return f'{node_id}[{content}]'
+
+
 def _sanitize_mermaid_code(code: str) -> str:
     """Sanitize invalid Mermaid syntax."""
     if not code:
@@ -71,6 +80,9 @@ def _sanitize_mermaid_code(code: str) -> str:
 
         # Fix decision nodes
         line = re.sub(r'(\b[A-Za-z0-9_]+)\{([^}]+)\}', _fix_decision_node, line)
+
+        # Fix square bracket nodes with parens or special chars: D[Text (parens)] -> D["Text (parens)"]
+        line = re.sub(r'(\b[A-Za-z0-9_]+)\[([^\]]*[\(\)\:\,][^\]]*)\]', _fix_square_bracket_node, line)
 
         # Fix 'A -- Text --> B' pattern to valid 'A -->|Text| B'
         line = re.sub(r'(\b\w+)\s+--\s+([^\-\>]+)\s+-->\s+(\b\w+)', r'\1 -->|\2| \3', line)
