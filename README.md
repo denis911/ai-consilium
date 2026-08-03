@@ -138,7 +138,7 @@ AI Consilium incorporates production-grade engineering principles to ensure secu
 6. **Streamlit Event Loop & Resource Isolation:**
    - Incorporates `nest_asyncio.apply()` and `@st.cache_resource` singletons for DuckDB connections and SentenceTransformer embeddings, preventing event loop conflicts, connection leaks, and duplicate memory usage.
 7. **LLM Judge Fallback Chain:**
-   - `LLMJudgeSynthesizer` uses a fallback chain (`Gemini 2.5 Flash` -> `GPT-4o` -> `Claude 3.5 Haiku` -> `OpenRouter Free`) so qualitative synthesis succeeds even if a primary provider API is down.
+   - `LLMJudgeSynthesizer` uses a fallback chain (`Gemini 2.5 Flash` -> `o3-mini` -> `Claude Sonnet 5` -> `xAI Grok 4.5` -> `OpenRouter Free`) so qualitative synthesis succeeds even if a primary provider API is down.
 8. **Dynamic API Key Detection:**
    - `LLMProviderEngine.get_effective_models()` dynamically inspects environment variables and queries only models for which active API keys exist, avoiding silent timeout errors.
 9. **Z-Score Outlier Detection & Insufficient Model Warnings:**
@@ -318,12 +318,12 @@ To evaluate AI Consilium completely **free of charge ($0 API cost, zero credit c
 1. **Create Account:** Go to [openrouter.ai](https://openrouter.ai/) and sign up.
 2. **Generate Key:** Navigate to [openrouter.ai/keys](https://openrouter.ai/keys), click **"Create Key"**, and copy your generated key (`sk-or-v1-...`).
 3. **Save to `.env`:** Add `OPENROUTER_API_KEY=sk-or-v1-your-key` into your local `.env` file.
-4. **Automatic Free-Tier Routing:** When only `OPENROUTER_API_KEY` is set, AI Consilium automatically dispatches queries concurrently to 5 frontier free models:
-   - ⚡ `meta-llama/llama-3.3-70b-instruct:free`
-   - 🧠 `google/gemma-3-27b-it:free`
-   - 🌐 `qwen/qwen-2.5-coder-32b-instruct:free`
-   - 💻 `cohere/north-mini-code:free`
-   - 🏊 `inclusionai/ling-3.0-flash:free`
+4. **Automatic Free-Tier Routing:** When only `OPENROUTER_API_KEY` is set (or when "⚡ OpenRouter $0 Free Model Tier" is toggled ON), AI Consilium automatically dispatches queries concurrently to 5 active free models:
+   - ⚡ `openrouter/inclusionai/ling-3.0-flash:free`
+   - 🧠 `openrouter/google/gemma-4-26b-a4b-it:free`
+   - 🌐 `openrouter/nvidia/nemotron-3-nano-30b-a3b:free`
+   - 💻 `openrouter/poolside/laguna-s-2.1:free`
+   - 🏊 `openrouter/cohere/north-mini-code:free`
 
 > [!NOTE]
 > **Zero External API Keys for RAG & Local DuckDB Storage:** The **DuckDB RAG Engine** (`council/rag.py`) and Telemetry Logger (`council/telemetry.py`) run 100% locally using an embedded DuckDB database file (`ai_consilium.duckdb`). DuckDB automatically creates the file on first run. Database files (`*.duckdb`, `*.duckdb.wal`) are blocked by `.gitignore` to guarantee your research history and vector indices remain 100% private on your machine.
@@ -416,7 +416,7 @@ AI Consilium provides two operational model modes designed for different stages 
 
 ### 1. ⚡ Zero-Cost Free Model Tier (`OPENROUTER_FREE_MODELS`)
 - **Ideal for:** Rapid development, dry-run testing, offline prototyping, and budget-zero experimentation.
-- **Provider:** 5 free models on OpenRouter (`:free`) including `google/gemma-4-31b-it:free`, `openai/gpt-oss-20b:free`, `cohere/north-mini-code:free`, etc.
+- **Provider:** 5 verified free models on OpenRouter (`:free`) including `inclusionai/ling-3.0-flash:free`, `google/gemma-4-26b-a4b-it:free`, `nvidia/nemotron-3-nano-30b-a3b:free`, `poolside/laguna-s-2.1:free`, and `cohere/north-mini-code:free`.
 - **Economics:** $0.00 total API cost.
 - **Trade-off:** Free-tier endpoints may occasionally experience rate-limiting or provider queue delays during peak usage.
 
