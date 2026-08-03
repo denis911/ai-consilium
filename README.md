@@ -270,19 +270,60 @@ If the directory does not exist yet, AI Consilium automatically creates it when 
 
 ---
 
-### 🔑 Zero-Cost Setup: How to Get a Free OpenRouter API Key
+### 🎨 Obsidian Mermaid CSS Magic (1-Minute Full-Width Setup)
 
-To run AI Consilium completely **free of charge ($0 API cost)** across 5 models:
+When Obsidian renders Mermaid flowcharts, its default Markdown viewer stretches vector SVGs based on height, which can make diagram text look small on wide displays. 
 
-1. **Create an account:** Go to [openrouter.ai](https://openrouter.ai/) and sign up.
+To make all exported consensus flowcharts **fill 100% of your note pane** with **crisp, readable, bold text**:
+
+1. **Open Snippets Folder:** In Obsidian, open **Settings (⚙️ bottom-left) -> Appearance -> CSS Snippets**, and click the folder icon 📁 **"Open snippets folder"**.
+2. **Create CSS File:** Create a text file named **`mermaid.css`** inside that folder with this content:
+   ```css
+   /* Make Mermaid fill 100% width of Obsidian pane */
+   .mermaid {
+       display: flex;
+       justify-content: center;
+       width: 100%;
+   }
+
+   .mermaid svg {
+       width: 100% !important;
+       max-width: 100% !important;
+       height: auto !important;
+       max-height: 750px !important;
+   }
+
+   /* Boost node font size & weight for crisp readability */
+   .mermaid .node label,
+   .mermaid .nodeText,
+   .mermaid .edgeLabel {
+       font-size: 15px !important;
+       font-weight: 600 !important;
+   }
+   ```
+3. **Enable Snippet:** Back in Obsidian **Settings -> Appearance -> CSS Snippets**, click the 🔄 **Refresh** icon and toggle **`mermaid.css`** to **ON**.
+
+> [!TIP]
+> **Why this CSS snippet works:**
+> - `width: 100% !important`: Forces SVG vectors to expand across 100% of your editor width.
+> - `max-height: 750px !important`: Prevents tall multi-level flowcharts from vertical truncation.
+> - `font-size: 15px !important`: Overrides default browser fonts to make decision nodes and arrow labels crisp and legible.
+
+---
+
+### 🔑 Zero-Cost Evaluator Setup: How to Get a Free OpenRouter API Key
+
+To evaluate AI Consilium completely **free of charge ($0 API cost, zero credit card required)** across 5 models:
+
+1. **Create Account:** Go to [openrouter.ai](https://openrouter.ai/) and sign up.
 2. **Generate Key:** Navigate to [openrouter.ai/keys](https://openrouter.ai/keys), click **"Create Key"**, and copy your generated key (`sk-or-v1-...`).
 3. **Save to `.env`:** Add `OPENROUTER_API_KEY=sk-or-v1-your-key` into your local `.env` file.
 4. **Automatic Free-Tier Routing:** When only `OPENROUTER_API_KEY` is set, AI Consilium automatically dispatches queries concurrently to 5 frontier free models:
-   - ⚡ `google/gemma-4-31b-it:free`
-   - 🧠 `openai/gpt-oss-20b:free`
-   - 🌐 `inclusionai/ling-3.0-flash:free`
+   - ⚡ `meta-llama/llama-3.3-70b-instruct:free`
+   - 🧠 `google/gemma-3-27b-it:free`
+   - 🌐 `qwen/qwen-2.5-coder-32b-instruct:free`
    - 💻 `cohere/north-mini-code:free`
-   - 🏊 `poolside/laguna-s-2.1:free`
+   - 🏊 `inclusionai/ling-3.0-flash:free`
 
 > [!NOTE]
 > **Zero External API Keys for RAG & Local DuckDB Storage:** The **DuckDB RAG Engine** (`council/rag.py`) and Telemetry Logger (`council/telemetry.py`) run 100% locally using an embedded DuckDB database file (`ai_consilium.duckdb`). DuckDB automatically creates the file on first run. Database files (`*.duckdb`, `*.duckdb.wal`) are blocked by `.gitignore` to guarantee your research history and vector indices remain 100% private on your machine.
