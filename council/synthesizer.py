@@ -28,12 +28,13 @@ JUDGE_FALLBACK_CHAIN = [
 
 
 def _sanitize_mermaid_code(code: str) -> str:
-    """Sanitize invalid Mermaid syntax (such as unquoted decision node parens, 'A -- Text --> B', or 'A & B --> C')."""
+    """Sanitize invalid Mermaid syntax."""
     if not code:
         return ""
     cleaned = code.replace("```mermaid", "").replace("```", "").strip()
     lines = cleaned.split("\n")
     cleaned_lines = []
+
     for line in lines:
         l = line
         # Clean out 'Unsupported markdown: list' hallucinations
