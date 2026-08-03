@@ -78,11 +78,18 @@ async def run_cli(args_parsed):
             from council.rag import DuckDBRAGEngine
             rag_engine = DuckDBRAGEngine(db_path="ai_consilium.duckdb")
             vault_results = rag_engine.search(query_text, top_k=3)
-            total_char_budget = 3000
+            total_char_budget = 10000
             current_chars = 0
             for r in vault_results:
                 snippet_title = r['title']
                 snippet_content = r['content'].strip()
+
+                # Strip Mermaid code & raw provider response blocks to maximize consensus density
+                if "## 📊 Consensus Architecture" in snippet_content:
+                    snippet_content = snippet_content.split("## 📊 Consensus Architecture")[0].strip()
+                elif "## 🔍 Multi-Model Raw Provider Responses" in snippet_content:
+                    snippet_content = snippet_content.split("## 🔍 Multi-Model Raw Provider Responses")[0].strip()
+
                 formatted_chunk = f"[Vault Note: {snippet_title}]\n{snippet_content}"
                 if current_chars + len(formatted_chunk) > total_char_budget:
                     remaining_budget = total_char_budget - current_chars

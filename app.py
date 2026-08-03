@@ -186,11 +186,19 @@ def main():
                     try:
                         persistent_rag = DuckDBRAGEngine(db_path="ai_consilium.duckdb", shared_model=consensus_engine.model)
                         vault_results = persistent_rag.search(user_query, top_k=3)
-                        total_char_budget = 3000
+                        total_char_budget = 10000
                         current_chars = 0
+
                         for r in vault_results:
                             snippet_title = r['title']
                             snippet_content = r['content'].strip()
+                            
+                            # Strip Mermaid code & raw provider response blocks to maximize consensus density
+                            if "## 📊 Consensus Architecture" in snippet_content:
+                                snippet_content = snippet_content.split("## 📊 Consensus Architecture")[0].strip()
+                            elif "## 🔍 Multi-Model Raw Provider Responses" in snippet_content:
+                                snippet_content = snippet_content.split("## 🔍 Multi-Model Raw Provider Responses")[0].strip()
+
                             formatted_chunk = f"[Vault Note: {snippet_title}]\n{snippet_content}"
                             
                             if current_chars + len(formatted_chunk) > total_char_budget:
