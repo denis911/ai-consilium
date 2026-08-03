@@ -73,7 +73,7 @@ litellm.set_verbose = False
 class LLMProviderEngine:
     """Manager for querying multiple LLM providers concurrently via LiteLLM."""
 
-    def __init__(self, default_timeout: float = 30.0):
+    def __init__(self, default_timeout: float = 60.0):
         self.default_timeout = default_timeout
         litellm.suppress_debug_info = True
         litellm.turn_off_message_logging = True

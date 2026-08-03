@@ -102,12 +102,12 @@ class ObsidianExporter:
 
         # Individual Model Raw Responses Section (escaping code fences)
         if artifact.responses:
-            md_body += "## 🔍 Multi-Model Raw Provider Responses\n"
+            md_body += "## 🔍 Multi-Model Raw Provider Responses\n\n"
             for resp in artifact.responses:
                 escaped_text = resp.response_text.replace("```", "~~~")
                 md_body += f"<details>\n"
                 md_body += f"<summary><b>{resp.model_name}</b> (Status: <code>{resp.status}</code>, Latency: <code>{resp.latency_ms:.1f}ms</code>)</summary>\n\n"
-                md_body += f"```text\n{escaped_text}\n```\n"
+                md_body += f"```text\n{escaped_text}\n```\n\n"
                 md_body += f"</details>\n\n"
 
         return yaml_frontmatter + md_body
