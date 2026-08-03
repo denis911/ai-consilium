@@ -27,6 +27,37 @@ JUDGE_FALLBACK_CHAIN = [
 ]
 
 
+def _fix_decision_node(m: re.Match) -> str:
+    """Fix decision nodes with unquoted text containing parens or special chars: C{Text (parens)?} -> C{"Text (parens)?"}"""
+    node_id = m.group(1)
+    content = m.group(2).strip()
+    if not (content.startswith('"') and content.endswith('"')):
+        content = f'"{content}"'
+    return f'{node_id}{{{content}}}'
+
+
+def _fix_node_parens(m: re.Match) -> str:
+    """Fix 'Node(Label containing parens or colons)' pattern to 'Node["Label"]'"""
+    node_id = m.group(1)
+    content = m.group(2).strip()
+    if content.startswith("(") and content.endswith(")"):
+        content = content[1:-1]
+    if not (content.startswith('"') and content.endswith('"')):
+        content = f'"{content}"'
+    return f'{node_id}[{content}]'
+
+
+def _expand_and_nodes(line: str) -> Optional[List[str]]:
+    """Expand 'NodeA & NodeB --> NodeC' pattern into individual connections."""
+    if " & " in line and "-->" in line:
+        parts = line.split("-->")
+        if len(parts) == 2:
+            left, right = parts[0].strip(), parts[1].strip()
+            left_nodes = [n.strip() for n in left.split("&")]
+            return [f"  {node} --> {right}" for node in left_nodes]
+    return None
+
+
 def _sanitize_mermaid_code(code: str) -> str:
     """Sanitize invalid Mermaid syntax."""
     if not code:
@@ -35,46 +66,25 @@ def _sanitize_mermaid_code(code: str) -> str:
     lines = cleaned.split("\n")
     cleaned_lines = []
 
-    for line in lines:
-        l = line
-        # Clean out 'Unsupported markdown: list' hallucinations
-        l = l.replace("Unsupported markdown: list", "Key Factors & Trade-offs")
+    for raw_line in lines:
+        line = raw_line.replace("Unsupported markdown: list", "Key Factors & Trade-offs")
 
-        # Fix decision nodes with unquoted text containing parens or special chars: C{Text (parens)?} -> C{"Text (parens)?"}
-        def fix_decision_node(m):
-            node_id = m.group(1)
-            content = m.group(2).strip()
-            if not (content.startswith('"') and content.endswith('"')):
-                content = f'"{content}"'
-            return f'{node_id}{{{content}}}'
-
-        l = re.sub(r'(\b[A-Za-z0-9_]+)\{([^}]+)\}', fix_decision_node, l)
+        # Fix decision nodes
+        line = re.sub(r'(\b[A-Za-z0-9_]+)\{([^}]+)\}', _fix_decision_node, line)
 
         # Fix 'A -- Text --> B' pattern to valid 'A -->|Text| B'
-        l = re.sub(r'(\b\w+)\s+--\s+([^\-\>]+)\s+-->\s+(\b\w+)', r'\1 -->|\2| \3', l)
+        line = re.sub(r'(\b\w+)\s+--\s+([^\-\>]+)\s+-->\s+(\b\w+)', r'\1 -->|\2| \3', line)
 
         # Fix 'Node(Label containing parens or colons)' pattern to 'Node["Label"]'
-        def fix_node_parens(m):
-            node_id = m.group(1)
-            content = m.group(2).strip()
-            if content.startswith("(") and content.endswith(")"):
-                content = content[1:-1]
-            if not (content.startswith('"') and content.endswith('"')):
-                content = f'"{content}"'
-            return f'{node_id}[{content}]'
-
-        l = re.sub(r'(\b[A-Za-z0-9_]+)\(([^)]*[\(\:\-][^)]*)\)', fix_node_parens, l)
+        line = re.sub(r'(\b[A-Za-z0-9_]+)\(([^)]*[\(\:\-][^)]*)\)', _fix_node_parens, line)
 
         # Fix 'NodeA & NodeB --> NodeC' pattern
-        if " & " in l and "-->" in l:
-            parts = l.split("-->")
-            if len(parts) == 2:
-                left, right = parts[0].strip(), parts[1].strip()
-                left_nodes = [n.strip() for n in left.split("&")]
-                for node in left_nodes:
-                    cleaned_lines.append(f"  {node} --> {right}")
-                continue
-        cleaned_lines.append(l)
+        expanded = _expand_and_nodes(line)
+        if expanded is not None:
+            cleaned_lines.extend(expanded)
+            continue
+
+        cleaned_lines.append(line)
     return "\n".join(cleaned_lines)
 
 
@@ -93,15 +103,6 @@ class LLMJudgeSynthesizer:
         consensus_metrics: ConsensusMetrics,
     ) -> List[dict]:
         """Construct structured evaluation prompt for the lead LLM judge."""
-        valid_responses = [r for r in responses if r.status == "success"]
-
-        responses_formatted = "\n\n".join([
-            f"=== Model: {r.model_name} (Latency: {r.latency_ms:.1f}ms) ===\n{r.response_text}"
-            for r in valid_responses
-        ])
-
-        outliers_str = ", ".join(consensus_metrics.outlier_models) if consensus_metrics.outlier_models else "None"
-
         system_instruction = (
             "You are AI Consilium's Chief Research Judge. Your job is to cross-examine multiple frontier LLM responses, "
             "synthesize unanimous consensus points, identify explicit contradictions, generate a clean Mermaid.js diagram "
@@ -115,7 +116,7 @@ class LLMJudgeSynthesizer:
             '  "mermaid_code": "flowchart TD\\n  A[Topic] --> B[Consensus]",\n'
             '  "obsidian_title": "2026-07-25-topic-name",\n'
             '  "tags": ["tag1", "tag2"]\n'
-            "}"
+            "}\n"
             "You are an executive AI Consilium Synthesizer. Your job is to analyze individual LLM responses to a query "
             "and synthesize an executive brief. Output strictly valid JSON without any markdown formatting."
         )

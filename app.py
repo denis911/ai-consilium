@@ -83,11 +83,15 @@ def run_async(coro):
     return loop.run_until_complete(coro)
 
 
+import html as html_lib
+
+
 def render_mermaid_diagram(mermaid_code: str):
     """Render a responsive Mermaid diagram with auto-fit styling using Streamlit native st.html."""
+    safe_code = html_lib.escape(mermaid_code)
     html_code = f"""
     <div class="mermaid" style="width: 100%; max-width: 100%; text-align: center; overflow-x: auto;">
-      {mermaid_code}
+      {safe_code}
     </div>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>

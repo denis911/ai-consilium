@@ -16,14 +16,23 @@ warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 
 logger = logging.getLogger(__name__)
 
+# Model Slug Constants
+MODEL_O3 = "o3-mini"
+MODEL_CLAUDE = "anthropic/claude-sonnet-5"
+MODEL_GEMINI = "gemini/gemini-2.5-flash"
+MODEL_PERPLEXITY = "perplexity/sonar"
+MODEL_XAI = "xai/grok-4.5"
+MODEL_DEEPSEEK = "openrouter/deepseek/deepseek-r1"
+OPENROUTER_PREFIX = "openrouter/"
+
 # Standard frontier model identifiers for LiteLLM
 DEFAULT_MODELS: List[str] = [
-    "o3-mini",
-    "anthropic/claude-sonnet-5",
-    "gemini/gemini-2.5-flash",
-    "perplexity/sonar",
-    "xai/grok-4.5",
-    "openrouter/deepseek/deepseek-r1",
+    MODEL_O3,
+    MODEL_CLAUDE,
+    MODEL_GEMINI,
+    MODEL_PERPLEXITY,
+    MODEL_XAI,
+    MODEL_DEEPSEEK,
 ]
 
 # OpenRouter 100% free model tier fallback identifiers
@@ -42,6 +51,16 @@ PRIMARY_PROVIDER_KEYS: List[str] = [
     "PERPLEXITY_API_KEY",
     "XAI_API_KEY",
 ]
+
+
+async def _execute_llm_call(call_kwargs: Dict[str, Any], timeout_val: float) -> Any:
+    """Helper coroutine executing litellm.acompletion with optional timeout wrapper."""
+    if timeout_val and timeout_val > 0:
+        return await asyncio.wait_for(
+            litellm.acompletion(**call_kwargs),
+            timeout=timeout_val,
+        )
+    return await litellm.acompletion(**call_kwargs)
 
 
 class LLMProviderEngine:
@@ -78,17 +97,17 @@ class LLMProviderEngine:
 
         # Filter DEFAULT_MODELS by available API keys
         model_key_mapping = {
-            "o3-mini": "OPENAI_API_KEY",
-            "anthropic/claude-sonnet-5": "ANTHROPIC_API_KEY",
-            "gemini/gemini-2.5-flash": "GEMINI_API_KEY",
-            "perplexity/sonar": "PERPLEXITY_API_KEY",
-            "xai/grok-4.5": "XAI_API_KEY",
-            "openrouter/deepseek/deepseek-r1": "OPENROUTER_API_KEY",
+            MODEL_O3: "OPENAI_API_KEY",
+            MODEL_CLAUDE: "ANTHROPIC_API_KEY",
+            MODEL_GEMINI: "GEMINI_API_KEY",
+            MODEL_PERPLEXITY: "PERPLEXITY_API_KEY",
+            MODEL_XAI: "XAI_API_KEY",
+            MODEL_DEEPSEEK: "OPENROUTER_API_KEY",
         }
 
         available_default_models = [
             m for m in DEFAULT_MODELS
-            if os.environ.get(model_key_mapping.get(m, "")) or (has_openrouter and m.startswith("openrouter/"))
+            if os.environ.get(model_key_mapping.get(m, "")) or (has_openrouter and m.startswith(OPENROUTER_PREFIX))
         ]
 
         return available_default_models if available_default_models else DEFAULT_MODELS
@@ -96,9 +115,9 @@ class LLMProviderEngine:
     def _get_openrouter_fallback_slug(self, model_name: str) -> Optional[str]:
         """Map direct provider model slugs to OpenRouter fallback endpoints."""
         mapping = {
-            "anthropic/claude-sonnet-5": "openrouter/anthropic/claude-sonnet-5",
-            "xai/grok-4.5": "openrouter/x-ai/grok-4.5",
-            "o3-mini": "openrouter/openai/o3-mini",
+            MODEL_CLAUDE: f"{OPENROUTER_PREFIX}anthropic/claude-sonnet-5",
+            MODEL_XAI: f"{OPENROUTER_PREFIX}x-ai/grok-4.5",
+            MODEL_O3: f"{OPENROUTER_PREFIX}openai/o3-mini",
         }
         return mapping.get(model_name)
 
@@ -120,7 +139,7 @@ class LLMProviderEngine:
             }
 
             # Add OpenRouter referrer headers if targeting an OpenRouter model
-            if model_name.startswith("openrouter/"):
+            if model_name.startswith(OPENROUTER_PREFIX):
                 headers = call_kwargs.get("extra_headers", {})
                 headers.update({
                     "HTTP-Referer": "https://github.com/denis911/ai-consilium",
@@ -129,18 +148,12 @@ class LLMProviderEngine:
                 call_kwargs["extra_headers"] = headers
 
             try:
-                if timeout_val and timeout_val > 0:
-                    response = await asyncio.wait_for(
-                        litellm.acompletion(**call_kwargs),
-                        timeout=timeout_val,
-                    )
-                else:
-                    response = await litellm.acompletion(**call_kwargs)
+                response = await _execute_llm_call(call_kwargs, timeout_val)
             except Exception as direct_err:
                 # If direct provider API fails and OPENROUTER_API_KEY is present, attempt OpenRouter fallback
                 openrouter_key = os.environ.get("OPENROUTER_API_KEY")
                 fallback_slug = self._get_openrouter_fallback_slug(model_name)
-                if openrouter_key and fallback_slug and not model_name.startswith("openrouter/"):
+                if openrouter_key and fallback_slug and not model_name.startswith(OPENROUTER_PREFIX):
                     logger.info(f"Direct query to {model_name} failed ({direct_err}). Attempting OpenRouter fallback ({fallback_slug})...")
                     call_kwargs["model"] = fallback_slug
                     headers = call_kwargs.get("extra_headers", {})
@@ -150,13 +163,7 @@ class LLMProviderEngine:
                     })
                     call_kwargs["extra_headers"] = headers
                     try:
-                        if timeout_val and timeout_val > 0:
-                            response = await asyncio.wait_for(
-                                litellm.acompletion(**call_kwargs),
-                                timeout=timeout_val,
-                            )
-                        else:
-                            response = await litellm.acompletion(**call_kwargs)
+                        response = await _execute_llm_call(call_kwargs, timeout_val)
                     except Exception as fallback_err:
                         logger.warning(f"OpenRouter fallback for {model_name} failed ({fallback_err}). Re-raising direct error.")
                         raise direct_err
