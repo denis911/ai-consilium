@@ -171,16 +171,29 @@ def main():
                 # Resolve cached singletons early
                 consensus_engine = get_consensus_engine()
 
-                # Step 1: RAG Context Preparation
-                status.update(label="1/4 📚 Ingesting context & retrieving RAG snippets...", state="running")
+                # Step 1: RAG Context Preparation (Persistent Vault Search + Manual Input)
+                status.update(label="1/4 📚 Searching vault RAG database & reference context...", state="running")
                 context_chunks = []
+
+                # Query persistent DuckDB vault database
+                try:
+                    persistent_rag = DuckDBRAGEngine(db_path="ai_consilium.duckdb", shared_model=consensus_engine.model)
+                    vault_results = persistent_rag.search(user_query, top_k=3)
+                    for r in vault_results:
+                        context_chunks.append(f"[Vault Note: {r['title']}]\n{r['content']}")
+                    persistent_rag.close()
+                except Exception as rag_err:
+                    logger.warning(f"Vault RAG search warning: {rag_err}")
+
+                # Combine with optional manually pasted text
                 if rag_context_input.strip():
                     rag_engine = DuckDBRAGEngine(db_path=":memory:", shared_model=consensus_engine.model)
                     rag_engine.ingest_documents([
-                        {"id": "doc1", "title": "Reference Context", "content": rag_context_input.strip()}
+                        {"id": "doc1", "title": "Manual Context", "content": rag_context_input.strip()}
                     ])
                     results = rag_engine.search(user_query, top_k=3)
-                    context_chunks = [r["content"] for r in results]
+                    for r in results:
+                        context_chunks.append(r["content"])
                     rag_engine.close()
 
                 query_input = ConsiliumQueryInput(
@@ -245,6 +258,13 @@ def main():
                 if st.button("📥 Export Note to Obsidian Vault", type="secondary", width="stretch"):
                     saved_path = exporter.export_artifact(artifact, vault_path=vault_path)
                     st.success(f"✅ Note exported to: `{saved_path}`")
+
+            # Grounded RAG Reference Context Display
+            if artifact.context_chunks:
+                with st.expander(f"📚 Grounded RAG Reference Context ({len(artifact.context_chunks)} notes retrieved from vault)"):
+                    for idx, chunk in enumerate(artifact.context_chunks, 1):
+                        st.markdown(f"**Snippet {idx}:**")
+                        st.code(chunk, language="text")
 
             # Feedback Rating Buttons
             st.markdown("**Rate this consensus brief:**")
