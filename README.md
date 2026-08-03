@@ -376,7 +376,7 @@ AI Consilium implements a **Knowledge Flywheel**:
 3. **Hot Start (RAG Grounding):** In the Streamlit sidebar under **Engine Settings**, toggle **"🧠 Enable Vault RAG Grounding"** to **ON**. Future queries will automatically retrieve past consensus notes from `ai_consilium.duckdb` and ground the LLM panel!
 
 > [!TIP]
-> **Cold Start Default:** "Enable Vault RAG Grounding" is **OFF by default** so new users start clean without empty database warnings. Toggle it **ON** once you have run `ingest.py` to unlock historical RAG grounding!
+> **Cold Start Default & Safety:** "Enable Vault RAG Grounding" (and the CLI `--rag` flag) is **OFF by default** so new users start clean. If toggled **ON** before running `ingest.py`, DuckDB safely returns 0 matching results without errors or prompt pollution. Toggle it **ON** once you have run `ingest.py` to unlock historical RAG grounding!
 
 ---
 
