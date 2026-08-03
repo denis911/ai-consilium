@@ -379,9 +379,9 @@ AI Consilium implements a **Knowledge Flywheel**:
 > **Cold Start Default & Safety:** "Enable Vault RAG Grounding" (and the CLI `--rag` flag) is **OFF by default** so new users start clean. If toggled **ON** before running `ingest.py`, DuckDB safely returns 0 matching results without errors or prompt pollution. Toggle it **ON** once you have run `ingest.py` to unlock historical RAG grounding!
 
 > [!IMPORTANT]
-> **RAG Context Budgeting & Cost Savings:**
-> - To prevent large Obsidian files (e.g. 20–40 KB notes) from overwhelming LLM prompt windows, AI Consilium enforces a strict cumulative **3,000 character cap (~500–750 tokens)** across all retrieved RAG snippets per query.
-> - **Best Practice:** Keep your Obsidian notes concise (under 1,000–2,000 characters / ~300 words) for maximum retrieval precision. If your vault contains multi-megabyte documents, leave Vault RAG **OFF** for standard queries to conserve API costs.
+> **Cost-Conscious RAG Guardrails & Pre-Fetch Summarization Pro-Tip:**
+> - **Why Context Limits Matter:** Sending massive 20–50 KB documents directly into a 5-model frontier panel will multiply API token costs by 5× and degrade response speed. To protect your wallet, AI Consilium enforces a strict cumulative **3,000 character cap (~500–750 tokens)** across all retrieved RAG snippets per query.
+> - **Pro-Tip for Large Documents / Multi-Page PDFs:** If you have massive PDF specifications or multi-page documents, leave Vault RAG **OFF**. Instead, ask ChatGPT or Claude to summarize the core points into a concise 1–2 paragraph snippet first, then paste it directly into the **"📚 Optional Reference Context"** input box in Streamlit. This guarantees 100% identical, cost-efficient grounding across all 5 models without wasting API credits!
 
 ---
 
