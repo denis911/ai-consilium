@@ -63,15 +63,22 @@ async def _execute_llm_call(call_kwargs: Dict[str, Any], timeout_val: float) -> 
     return await litellm.acompletion(**call_kwargs)
 
 
+# Silence excessive verbose logs & background workers from litellm
+litellm.suppress_debug_info = True
+litellm.turn_off_message_logging = True
+litellm.telemetry = False
+litellm.set_verbose = False
+
+
 class LLMProviderEngine:
     """Manager for querying multiple LLM providers concurrently via LiteLLM."""
 
     def __init__(self, default_timeout: float = 30.0):
         self.default_timeout = default_timeout
-        # Silence excessive verbose logs & background workers from litellm
         litellm.suppress_debug_info = True
         litellm.turn_off_message_logging = True
         litellm.telemetry = False
+        litellm.set_verbose = False
 
     def get_effective_models(
         self,

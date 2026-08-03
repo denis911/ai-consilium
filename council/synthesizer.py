@@ -100,6 +100,12 @@ def _sanitize_mermaid_code(code: str) -> str:
     return "\n".join(cleaned_lines)
 
 
+litellm.suppress_debug_info = True
+litellm.turn_off_message_logging = True
+litellm.telemetry = False
+litellm.set_verbose = False
+
+
 class LLMJudgeSynthesizer:
     """Synthesizer module using a lead LLM to evaluate multi-model consensus and contradictions."""
 
@@ -107,6 +113,9 @@ class LLMJudgeSynthesizer:
         self.default_lead_model = default_lead_model
         self.timeout = timeout
         litellm.suppress_debug_info = True
+        litellm.turn_off_message_logging = True
+        litellm.telemetry = False
+        litellm.set_verbose = False
 
     def _build_synthesis_prompt(
         self,
