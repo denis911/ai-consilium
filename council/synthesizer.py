@@ -114,7 +114,7 @@ class LLMJudgeSynthesizer:
             '    {"topic": "topic name", "description": "why they contradict", "conflicting_models": ["model1", "model2"]}\n'
             "  ],\n"
             '  "mermaid_code": "flowchart TD\\n  A[Topic] --> B[Consensus]",\n'
-            '  "obsidian_title": "2026-07-25-topic-name",\n'
+            '  "obsidian_title": "topic-name",\n'
             '  "tags": ["tag1", "tag2"]\n'
             "}\n"
             "You are an executive AI Consilium Synthesizer. Your job is to analyze individual LLM responses to a query "

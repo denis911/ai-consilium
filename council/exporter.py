@@ -41,6 +41,8 @@ class ObsidianExporter:
         clean = title.strip().lower()
         clean = re.sub(r"[^\w\s-]", "", clean)
         clean = re.sub(r"[\s_]+", "-", clean)
+        # Strip leading date patterns like YYYY-MM-DD- to prevent double date prefixes
+        clean = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", clean)
         return clean or "consensus-research-report"
 
     def _is_valid_mermaid(self, mermaid_code: str) -> bool:
