@@ -372,11 +372,16 @@ uv run python ingest.py --dir C:/ai-memory/ai-concilium
 ---
 
 ### 4. RAG Retrieval Evaluation Benchmark (`evaluate_retrieval.py`)
-Run empirical retrieval quality benchmarks calculating Hit Rate @ K and Mean Reciprocal Rank (MRR @ K):
+Run empirical RAG engine benchmarks calculating Hit Rate @ K and Mean Reciprocal Rank (MRR @ K):
 
 ```bash
 uv run python evaluate_retrieval.py
 ```
+
+> [!NOTE]
+> **Evaluation Scope & Roadmap Notice:**
+> - `evaluate_retrieval.py` currently runs against a synthetic baseline dataset in an **isolated in-memory DuckDB database** (`db_path=":memory:"`) to validate hybrid RRF (Vector + Keyword) retrieval accuracy without touching or mutating your local `ai_consilium.duckdb` vault index.
+> - **Roadmap (Next Iteration):** Direct vault evaluation mode allowing automated relevance scoring and Hit Rate / MRR calculation against your live ingested Obsidian notes.
 
 ---
 
