@@ -41,6 +41,11 @@ def parse_args(args=None):
         help="Route requests through OpenRouter's 100% free model tier (:free)",
     )
     parser.add_argument(
+        "--rag",
+        action="store_true",
+        help="Ground research query with past ingested notes from ai_consilium.duckdb",
+    )
+    parser.add_argument(
         "--export",
         "-e",
         action="store_true",
@@ -67,7 +72,19 @@ async def run_cli(args_parsed):
         print("Error: Query string cannot be empty.", file=sys.stderr)
         sys.exit(1)
 
-    query_input = ConsiliumQueryInput(query=query_text)
+    context_chunks = []
+    if args_parsed.rag:
+        try:
+            from council.rag import DuckDBRAGEngine
+            rag_engine = DuckDBRAGEngine(db_path="ai_consilium.duckdb")
+            vault_results = rag_engine.search(query_text, top_k=3)
+            for r in vault_results:
+                context_chunks.append(f"[Vault Note: {r['title']}]\n{r['content']}")
+            rag_engine.close()
+        except Exception as e:
+            logger.warning(f"CLI RAG retrieval warning: {e}")
+
+    query_input = ConsiliumQueryInput(query=query_text, context_chunks=context_chunks)
 
     # Step 1: Multi-Model Async Querying
     provider_engine = LLMProviderEngine(default_timeout=35.0)

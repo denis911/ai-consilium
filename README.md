@@ -356,6 +356,9 @@ uv run python main.py --query "Compare PostgreSQL vs DuckDB for desktop analytic
 # Run query using OpenRouter $0 free model tier & export note to Obsidian vault
 uv run python main.py --query "Compare PostgreSQL vs DuckDB" --free-tier --export
 
+# Run query with local DuckDB vault RAG grounding
+uv run python main.py --query "Compare PostgreSQL vs DuckDB" --rag
+
 # Output full JSON artifact payload to stdout
 uv run python main.py --query "Compare PostgreSQL vs DuckDB" --json
 ```
