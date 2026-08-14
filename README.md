@@ -1,6 +1,6 @@
 # AI Consilium — Dual-Engine Consensus Research Agent
 
-> **LLM Zoomcamp Capstone Project** | **Spec-Driven Design (SDD)** | **Multi-Model Consensus Architecture**
+> **Spec-Driven Design (SDD)** | **Multi-Model Consensus Architecture**
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Package Manager: uv](https://img.shields.io/badge/package_manager-uv-6E40C9.svg)](https://github.com/astral-sh/uv)
@@ -21,27 +21,12 @@ Solopreneurs cannot afford $500/hr corporate retainers to cross-check architectu
 AI Consilium transforms unpredictable LLM outputs into an **auditable multi-model consensus workflow**. Powered by **LiteLLM**, it asynchronously queries **5 frontier LLM providers** (OpenAI o3-mini, Anthropic Claude 3.5 Sonnet, Gemini 2.5 Flash, Perplexity Sonar, and DeepSeek-R1 reasoning model) with retrieved local reference context. For zero-cost local testing, it includes a 1-click fallback to 5 free models on OpenRouter (`:free`). It calculates a mathematical **Consensus Score (0–100%)** via 384-dimensional embedding distance, identifies statistical Z-score outliers, runs an LLM-as-a-Judge qualitative synthesis, renders dynamic **Mermaid.js visualizations**, logs telemetry in DuckDB, and exports structured research notes directly into a local **Obsidian vault**.
 
 ### 💡 Project Origin & Personal Motivation
-While the concept of multi-LLM consensus (known in AI research as *Multi-Agent Debate (MAD)* or *Mixture-of-Agents (MoA)*) is an established architectural pattern, **AI Consilium was created out of two real-world motivations:**
+While the concept of multi-LLM consensus (known in AI research as *Multi-Agent Debate (MAD)* or *Mixture-of-Agents (MoA)*) is an established architectural pattern, **AI Consilium was created out of real-world motivations:**
 
 1. **Scratching My Own Itch:** I spent endless hours manually cross-validating code, architecture patterns, and technical decisions by copy-pasting questions across ChatGPT, Claude, and Gemini tabs back and forth. Managing scattered answers manually became unsustainable, making an automated multi-model consensus harness and local knowledge base finally inevitable.
-2. **Applying LLM Zoomcamp in Real Life:** I wanted to take the core engineering concepts learned throughout DataTalksClub's LLM Zoomcamp (RAG retrieval, vector search, evaluation metrics, telemetry, and LiteLLM integration) and synthesize them into a practical tool for daily engineering workflows.
+2. **Real-World Engineering:** Synthesizing core concepts (RAG retrieval, vector search, evaluation metrics, telemetry, and LiteLLM integration) into a practical tool for daily engineering workflows.
 
----
-
-## 📊 Evaluator Fast-Track: LLM Zoomcamp Capstone Scoring Matrix
-
-This project was built from the ground up to fulfill every requirement of the [DataTalksClub LLM Zoomcamp Capstone Criteria](https://github.com/DataTalksClub/llm-zoomcamp/blob/main/project.md). 
-
-| Evaluation Criteria | Target Score | Detailed Justification & Implementation |
-| :--- | :--- | :--- |
-| **1. Problem Description** | **2 / 2 points** | Clear, high-stakes target audience (solopreneurs/founders) with specific pain points (mitigating single-model hallucination risk in legal, tax, and system architecture decisions via multi-LLM cross-validation). |
-| **2. RAG Pipeline & Retrieval** | **6 / 6 points** | Uses embedded **DuckDB** for zero-dependency hybrid search combining **Dense Vector Search (`vss` extension)** and **Sparse Full-Text Search (`fts` extension)** over local Obsidian notes and reference docs. |
-| **3. RAG / LLM Evaluation** | **6 / 6 points** | Dual-layer evaluation: 1) **Quantitative Metric:** Pairwise cosine similarity matrix using `sentence-transformers` embeddings + Z-score outlier detection. 2) **Qualitative Metric:** LLM-as-a-Judge synthesis with fallback chain. 3) **Retrieval Evaluation:** Hit Rate & MRR benchmark script (`evaluate_retrieval.py`). |
-| **4. Monitoring & Observability** | **6 / 6 points** | Built-in DuckDB `query_logs` tracking query parameters, individual model latencies, token counts, estimated API costs, consensus scores, and **User Feedback (+1 / -1 thumbs ratings)**. |
-| **5. User Interface** | **6 / 6 points** | **Dual-mode interface:** 1) Interactive **Streamlit Web Application** (`app.py`) featuring real-time query progress bars, interactive consensus gauges, live Mermaid.js diagram rendering, user feedback buttons, and Obsidian export. 2) Command-line **CLI mode** (`python main.py --query "..."`). |
-| **6. Deployment & Containerization** | **6 / 6 points** | Fully containerized with a multi-stage `Dockerfile` (using `uv`) and `docker-compose.yml` for single-command startup (`docker compose up`) with `.dockerignore` security isolation. |
-| **7. Reproducibility & Environment** | **4 / 4 points** | Built using **`uv`** (`pyproject.toml` + `uv.lock`) for lightning-fast, deterministic dependency resolution. Includes `.env.example`, automated setup scripts, 48 automated unit/integration tests, and clean documentation. |
-| **TOTAL** | **36 / 36 points** | **Maximum possible score across all 7 evaluation categories.** |
+*(For historical LLM Zoomcamp Capstone evaluation criteria and scoring matrix, see [`_docs/llm_zoomcamp_evaluation.md`](file:///c:/tmp/ai-consilium/_docs/llm_zoomcamp_evaluation.md).)*
 
 ---
 
