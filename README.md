@@ -182,6 +182,10 @@ AI Consilium incorporates production-grade engineering principles to ensure secu
 
 ```text
 ai-consilium/
+├── .agents/                    # Agent Customizations & Operating Guardrails
+│   ├── rules/                  # Always-on local rules (e.g., ponytail.md lean-coding)
+│   └── skills/                 # On-demand custom workflows & review skills
+├── AGENTS.md                   # Core agent commands, rules, and Dual-Review workflow
 ├── _docs/                      # SDD Specifications & Architectural Blueprints
 │   ├── mission.md              # Vision, target audience, and core pillars
 │   ├── high_level_spec.md      # Detailed technical specification
@@ -457,7 +461,7 @@ tests/test_telemetry.py ..                                               [100%]
 Every feature and bug fix in AI Consilium passes through a rigorous **5-Step Dual-Review Pipeline** involving two independent AI reviewer personas, SonarCloud MCP static analysis enrichment, and automated test validation:
 
 ```
- 1. Coding & Implementation    --->  Primary coding AI (Gemini 3.6 Flash / Antigravity) implements feature requests based on groomed issues.
+ 1. Coding & Implementation    --->  Primary coding AI (Gemini / Antigravity) implements features under Ponytail lean-coding guardrails.
  2. Automated Test Battery     --->  Full test suite (`uv run pytest`) is executed to ensure zero regressions before committing to `main`.
  3. SonarCloud & CI Scan       --->  3–5 min background window: SonarCloud scans commit; non-source noise files (`uv.lock`, `*.duckdb`) excluded.
  4. Dual-Review Audit Phase    --->  Code audited by specialized reviewer personas (Claude 3.5 Sonnet & Google Jules) with optional Sonar MCP data.
