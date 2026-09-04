@@ -3,7 +3,7 @@ Hybrid Embedding Consensus Matrix & Outlier Detector for AI Consilium
 """
 
 import logging
-from typing import List, Dict, Optional
+from typing import List, Dict
 import numpy as np
 from sentence_transformers import SentenceTransformer
 

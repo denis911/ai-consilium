@@ -6,7 +6,7 @@ import json
 import uuid
 import datetime
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 import duckdb
 
 from council.schemas import ConsiliumFinalArtifact
