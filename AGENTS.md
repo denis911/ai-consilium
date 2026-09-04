@@ -2,10 +2,11 @@ Commands
 
 - `uv sync` - install dependencies
 - `uv run pytest` - the whole suite
-- `uv run pytest tests/test_home.py` - one test file
+- `uv run pytest tests/test_basic.py` - one test file
 
 Rules
 
+- Tasks are GitHub issues executed one at a time following [`_docs/process.md`](file:///c:/tmp/ai-consilium/_docs/process.md) and [`_docs/team/pm.md`](file:///c:/tmp/ai-consilium/_docs/team/pm.md). Read acceptance criteria before starting and before closing.
 - Dependencies are added in `pyproject.toml`. Do not add one without asking.
 - **Context7 MCP Verification Rule:** All coding agents MUST double-check library/framework syntax (LiteLLM model slugs, Streamlit UI parameters, DuckDB methods, Mermaid diagram syntax) using Context7 MCP server (`resolve-library-id`, `query-docs`) or direct API `/v1/models` endpoints BEFORE implementing code changes to eliminate API deprecation and syntax bugs.
 - **Streamlit UI Best Practices:**
@@ -17,10 +18,15 @@ Rules
   - Wrap decision node text containing parens or special characters in quotes (`C{"Label (parens)?"}`).
   - Convert arrow labels to standard `A -->|Text| B` format.
   - Strip hallucinated `Unsupported markdown: list` text.
+- **Ponytail Lean-Coding Guardrail (`.agents/rules/ponytail.md`):**
+  - Ask "Why?" first. Challenge whether any new function, class, or abstraction is strictly necessary.
+  - Produce Minimal Viable Diffs (MVD)—avoid opportunistic refactoring or speculative indirection.
+  - Delete dead/redundant code rather than adding boilerplate.
+  - Keep production logic lean while preserving complete `pytest` coverage and docstring rigor.
 
 Workflow & Dual-Review Pipeline
 
-1. **Coding Phase:** The primary coding agent (Gemini 3.6 Flash / Antigravity) implements feature requests or bug fixes based on groomed GitHub issues.
+1. **Coding Phase:** The primary coding agent (Gemini / Antigravity) implements feature requests or bug fixes based on groomed GitHub issues under **Ponytail lean-coding guardrails** (minimal viable diffs, zero speculative bloat).
 2. **Testing & DoD:** The coding agent runs the full test suite (`uv run pytest`), commits code changes directly to `main`, pushes to GitHub, and closes the coding issue.
 3. **Dual-Review Phase (Specialized Personas, SonarCloud MCP & Noise Reduction):**
    - After a commit, allow 3–5 minutes for background CI / SonarCloud scanning to complete.
