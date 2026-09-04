@@ -4,7 +4,7 @@ RAG Retrieval Evaluation Script (Hit Rate & MRR Benchmark) for AI Consilium
 
 import sys
 import logging
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 from council.rag import DuckDBRAGEngine
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")

@@ -3,12 +3,11 @@ Bulk Obsidian Vault Directory Ingestion CLI & Auto-Sync Script for AI Consilium
 """
 
 import os
-import sys
 import re
 import argparse
 import logging
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional
 
 import duckdb
 from council.rag import DuckDBRAGEngine

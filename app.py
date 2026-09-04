@@ -8,6 +8,7 @@ import streamlit as st
 from dotenv import load_dotenv
 
 # Load environment variables from .env
+load_dotenv()
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 
@@ -81,9 +82,6 @@ def run_async(coro):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return loop.run_until_complete(coro)
-
-
-import html as html_lib
 
 
 def render_mermaid_diagram(mermaid_code: str):
